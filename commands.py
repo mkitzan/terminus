@@ -1,14 +1,10 @@
 import session
 import query
+import statics
 import dataprint
 
 
-PAUSE = "\nPress Enter to continue..."
-
-
 def insert(inpt, info):
-    where, columns = query.parse_flags(inpt)
-
     chunk = []
     bit = []
     for i in inpt[1:]:
@@ -20,14 +16,12 @@ def insert(inpt, info):
     chunk.append(bit)
 
     inpt = [" ".join(i) for i in chunk]
-    
-    columns = [i for i in columns.keys() if columns[i] == 0]
-    columns = query.order_columns(columns)
-    
-    sql_query = "INSERT INTO " + info[1] + "(" + ", ".join(columns) + ") VALUES('" + "', '".join(inpt) + "')"
-    print(sql_query)
+
+    sql_query = "INSERT INTO " + info[1] + \
+                "(" + ", ".join(statics.HOST_SET[info[1]]) + ") VALUES ('" + "', '".join(inpt) + "')"
     query.execute_sql(info[0], sql_query)
     info[0].commit()
+    input(statics.PAUSE)
 
 
 def upload(inpt, info):
@@ -35,13 +29,12 @@ def upload(inpt, info):
         row = file.readline()
         while row:
             row = row.strip("\n").split(",")
-            sql_query = "INSERT INTO " + info[1] + "(Title, Author, Genre, Year, Pages, Type, Format, Finished)" \
+            sql_query = "INSERT INTO " + info[1] + "(" + ", ".join(statics.HOST_SET[info[1]]) + ")" \
                                                    " VALUES('" + "', '".join(row) + "')"
             query.execute_sql(info[0], sql_query)
             info[0].commit()
 
             row = file.readline()
-
 
 
 def remove(inpt, info):
@@ -55,37 +48,36 @@ def complete(inpt, info):
     sql_query = query.parse_sql(inpt, info[1], "complete")
 
     query.execute_sql(info[0], sql_query)
-    inpt[0].commit()
+    info[0].commit()
 
 
 def aggregate(inpt, info):
     inpt[1][0].upper()
 
     if inpt[0] == "-avg" or inpt[0] == "--average":
-        agg = "AVG(" + inpt[1] + ")"
+        agg = "AVG"
     elif inpt[0] == "-sum" or inpt[0] == "--sum":
-        agg = "SUM(" + inpt[1] + ")"
+        agg = "SUM"
     else:
-        agg = "COUNT(" + inpt[1] + ")"
-
-    sql_query = "SELECT " + agg + " FROM " + info[1] + " WHERE " + query.parse_flags(inpt[2:])[0]
+        agg = "COUNT"
+        
+    sql_query = "SELECT " + agg + "(" + inpt[1] + ")" + " FROM " + info[1] + " WHERE " + query.parse_flags(inpt[2:])[0]
 
     columns, results = query.execute_sql(info[0], sql_query)
     dataprint.table(columns, results)
-    input(PAUSE)
+    input(statics.PAUSE)
 
 
 def search(inpt, info):
     if "*" in inpt:
         sort = query.sorting(inpt)
         sql_query = "SELECT * FROM " + info[1] + sort
-        print(sql_query)
     else:
         sql_query = query.parse_sql(inpt, info[1], "search")
 
     columns, results = query.execute_sql(info[0], sql_query)
     dataprint.table(columns, results)
-    input(PAUSE)
+    input(statics.PAUSE)
 
 
 def change(inpt, info):
@@ -125,11 +117,17 @@ def cmd_help(inpt, info):
         -F or --finished    flag specifies whether the book's been finished
         -c or --collection  flag specifies a short story's collection
         -q or --quote       flag specifies a book quote
-        -s or --sort        flag specifies the sorting column\n
+        -s or --sort        flag specifies the sorting column
+        -d or --date        flag specifies the date in day/mon/year hr:mi:sc
+        -u or --user        flag specifies the user
+        -o or --operation   flag specifies the operation used
+        -h or --host        flag specifies the host
+        -A or --arguments   flag specifies the command arguments\n
     Flag support by host:
         books:      -t, -a, -g, -y, -p, -T, -f, -F
         stories:    -t, -a, -g, -y, -p, -c
-        quotes:     -t, -a, -y, -q\n
+        quotes:     -t, -a, -y, -q
+        records:    -d, -u, -o, -h, -A\n
     Command list:
         search      perform SELECT SQL function
         insert      performs INSERT INTO SQL function
@@ -174,11 +172,12 @@ def cmd_help(inpt, info):
     Expected column ordering by host table:
         books:      -t, -a, -g, -y, -p, -T, -f, -F
         stories:    -t, -a, -g, -y, -p, -c, -F
-        quotes:     -t, -a, -y, -q\n
+        quotes:     -t, -a, -y, -q
+        records:    -d, -u, -o, -h, -A\n
     Example: upload /path/to/file/if/not/in/curr/directory/test_upload.csv
     If an item in the upload has a column value with a comma, insert that item individually""")
         elif inpt[0] == "exit":
             print("""
     Exit takes no arguments used to safely leave the program""")
 
-    input(PAUSE)
+    input(statics.PAUSE)
