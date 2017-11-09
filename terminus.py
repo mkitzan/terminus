@@ -1,18 +1,19 @@
 #!/usr/bin/python3
 import session
 import query
+import statics
 
 
 def format_quote(quote):
-    barrier = 90
+    barrier = statics.WIDTH-statics.BOUNDS
     length = len(quote)
 
-    while barrier+30 < length:
-        for i in range(30):
+    while barrier+statics.BOUNDS < length:
+        for i in range(statics.BOUNDS):
             if quote[barrier+i] == " ":
                 quote = quote[:barrier+i] + "\n " + quote[barrier+i:]
                 break
-        barrier += 110
+        barrier += statics.WIDTH-(statics.BOUNDS-20)
 
     return quote
 
@@ -40,21 +41,23 @@ def home_screen(db):
     """)
 
     random_quote(db)
-    input("\nPress Enter to Continue...")
+    input(statics.PAUSE)
     session.clear_screen()
 
 
 def main():
     session.title()
+    session.resize()
+    session.clear_screen()
 
-    info = []
-    info.append(session.get_connection())
+    info = [None, None, None]
+    info[0] = session.get_connection()
 
     home_screen(info[0])
 
-    info.append(session.change_host(info[0]))
-    info.append(session.change_user(info[0]))
-
+    info[2] = session.change_user(info[0])
+    info[1] = session.change_host(info[0])
+    
     query.landing(info)
     session.clear_screen()
     exit()

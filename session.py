@@ -2,9 +2,22 @@ import os
 import hashlib
 import sqlite3
 import getpass
+import time
+import query
+import statics
 
 
-VERSION = "Terminus vDEV"
+def new_user(inpt, connection):
+    sql_query = "INSERT INTO credentials VALUES('" + hash_credentials(inpt[0], inpt[1]) + "')"
+    query.execute_sql(connection, sql_query)
+    connection.commit()
+
+
+def create_record(inpt, info):
+    sql_query = "INSERT INTO records VALUES('" + time.strftime("%d/%m/%Y %H:%M:%S") + "', '" + info[2] + "', '" + \
+                inpt[0] + "', '" + info[1] + "', '" + " ".join(inpt[1:]) + "')"
+    query.execute_sql(info[0], sql_query)
+    info[0].commit()
 
 
 def hash_credentials(text, key):
@@ -80,10 +93,20 @@ def clear_screen():
         os.system("cls")
     else:
         os.system("clear")
+        
+        
+def resize():
+    if os.system == "nt":
+        print("todo")
+    else:
+        os.system("resize -s " + str(statics.HEIGHT) + " " + str(statics.WIDTH))
 
 
 def title():
-    os.system("title " + VERSION)
+    if os.system == "posix":
+        os.system("echo -e '\033]2;'" + statics.VERSION + "'\007'")
+    else:
+        os.system("title " + statics.VERSION)
 
 
 def get_connection():

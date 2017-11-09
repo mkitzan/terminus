@@ -1,5 +1,6 @@
 import session
 import commands
+import statics
 
 
 def execute_sql(db, sql_query):
@@ -9,6 +10,7 @@ def execute_sql(db, sql_query):
     columns = None
     if curs.description is not None:
         columns = [i[0] for i in curs.description]
+        
     results = curs.fetchall()
 
     curs.close()
@@ -18,104 +20,44 @@ def execute_sql(db, sql_query):
 
 def sorting(args):
     sort = ""
-    if "-s" in args:
-        index = args.index("-s")
+    index = (args.index("-s") if "-s" in args else args.index("--sort") if "--sort" in args else -1)
+
+    if index != -1:
         sort += " ORDER BY " + args.pop(index + 1)
-        args.remove("-s")
-    elif "--sort" in args:
-        index = args.index("--sort")
-        sort += " ORDER BY " + args.pop(index + 1)
-        args.remove("--sort")
+        args.pop(index)
 
     return sort
 
 
 def parse_flags(args):
-    columns = {"Author": 1, "Title": 1,
-               "Genre": 1, "Format": 1,
-               "Type": 1, "Year": 1,
-               "Pages": 1, "Finished": 1,
-               "Collection": 1, "Quote": 1}
+    columns = {k: 0 for k in statics.ALL_COLUMNS}
 
     where = ""
 
     sort = sorting(args)
 
-    length = len(args)
+    for i in range(len(args)):
+        arg = str(args[i])
+        curr = arg[1:3] if len(arg) > 2 else arg
 
-    for i in range(length):
-        if str(args[i])[0] == "-":
-            where = where[:-1] + "' and "
-            if args[i] == "-a" or args[i] == "--author":
-                where += "Author='"
-                columns["Author"] = 0
-
-            elif args[i] == "-t" or args[i] == "--title":
-                where += "Title='"
-                columns["Title"] = 0
-
-            elif args[i] == "-g" or args[i] == "--genre":
-                where += "Genre='"
-                columns["Genre"] = 0
-
-            elif args[i] == "-f" or args[i] == "--format":
-                where += "Format='"
-                columns["Format"] = 0
-
-            elif args[i] == "-T" or args[i] == "--type":
-                where += "Type='"
-                columns["Type"] = 0
-
-            elif args[i] == "-y" or args[i] == "--year":
-                where += "Year='"
-                columns["Year"] = 0
-
-            elif args[i] == "-p" or args[i] == "--pages":
-                where += "Pages='"
-                columns["Pages"] = 0
-
-            elif args[i] == "-F" or args[i] == "--finished":
-                where += "Finished='"
-                columns["Finished"] = 0
-
-            elif args[i] == "-q" or args[i] == "--quote":
-                where += "Quote='"
-                columns["Quote"] = 0
-
-            elif args[i] == "-c" or args[i] == "--collection":
-                where += "Collection='"
-                columns["Collection"] = 0
-
+        if curr in statics.FLAGS.keys():
+            where = where[:-1] + "' and " + statics.FLAGS[curr] + "='"
+            columns[statics.FLAGS[curr]] = 1
+            
         else:
-            where += str(args[i]) + " "
+            where += arg + " "
 
     return where[6:-1] + "'" + sort, columns
     
     
 def order_columns(columns):
-    all_cols = ["Title", "Author",
-                "Genre", "Year",
-                "Pages", "Type",
-                "Format", "Finished",
-                "Collection", "Quote"]
-          
-    ordered_cols = []
-    for i in all_cols:
-        if i in columns:
-            ordered_cols.append(i)
-    
-    return ordered_cols
+    return [i for i in statics.ALL_COLUMNS if i in columns]
 
 
 def parse_sql(args, host, operation):
     where, columns = parse_flags(args)
-
-    if host == "books":
-        columns = [i for i in columns.keys() - ["Quote", "Collection"] if columns[i] == 1]
-    elif host == "stories":
-        columns = [i for i in columns.keys() - ["Quote", "Format", "Type"] if columns[i] == 1]
-    elif host == "quotes":
-        columns = [i for i in columns.keys() - ["Collection", "Finished", "Format", "Type", "Pages", "Genre"] if columns[i] == 1]
+        
+    columns = [i for i in statics.HOST_SET[host] if columns[i] == 0]
 
     if operation == "remove":
         sql_query = "DELETE FROM " + host
@@ -141,6 +83,7 @@ def run_command(command, info):
     else:
         print()
         try:
+            session.create_record(command, info)
             functions[command[0]](command[1:], info)
         except:
             input("Error occurred while executing.\nTry: help " + (command[0] if command[0] != "help" else ""))
