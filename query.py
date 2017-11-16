@@ -30,42 +30,32 @@ def sorting(args):
 
 
 def parse_flags(args):
-    columns = {k: 0 for k in statics.ALL_COLUMNS}
-
     where = ""
 
     sort = sorting(args)
 
     for i in range(len(args)):
-        arg = str(args[i])
+        arg = str(args[i]).replace("*", "%").replace("?", "_")
+        
         curr = arg[1:3] if len(arg) > 2 else arg
 
         if curr in statics.FLAGS.keys():
-            where = where[:-1] + "' and " + statics.FLAGS[curr] + "='"
-            columns[statics.FLAGS[curr]] = 1
-            
+            where = where[:-1] + "' and " + statics.FLAGS[curr] + " LIKE '"
         else:
             where += arg + " "
 
-    return where[6:-1] + "'" + sort, columns
-    
-    
-def order_columns(columns):
-    return [i for i in statics.ALL_COLUMNS if i in columns]
+    return where[6:-1] + "'" + sort
 
 
 def parse_sql(args, host, operation):
-    where, columns = parse_flags(args)
-        
-    columns = [i for i in statics.HOST_SET[host] if columns[i] == 0]
+    where = parse_flags(args)
 
     if operation == "remove":
         sql_query = "DELETE FROM " + host
     elif operation == "complete":
         sql_query = "UPDATE " + host + " SET Finished='true'"
     else:
-        columns = order_columns(columns)
-        sql_query = "SELECT " + ", ".join(columns) + " FROM " + host
+        sql_query = "SELECT " + ", ".join(statics.HOST_SET[host]) + " FROM " + host
 
     return sql_query + " WHERE " + where
 
