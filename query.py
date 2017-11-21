@@ -64,7 +64,8 @@ def run_command(command, info):
     command = command.split(" ")
     functions = {"search": commands.search, "insert": commands.insert,
                  "remove": commands.remove, "complete": commands.complete,
-                 "exit": commands.close_out, "aggregate": commands.aggregate,
+                 "exit": commands.close_out, "sum": commands.sum,
+                 "count": commands.count, "average": commands.average,
                  "change": commands.change, "help": commands.cmd_help,
                  "upload": commands.upload}
     

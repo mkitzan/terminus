@@ -50,17 +50,20 @@ def complete(inpt, info):
     info[0].commit()
 
 
-def aggregate(inpt, info):
-    inpt[1][0].upper()
+def sum(inpt, info):
+    aggregate("SUM", inpt, info)
 
-    if inpt[0] == "-avg" or inpt[0] == "--average":
-        agg = "AVG"
-    elif inpt[0] == "-sum" or inpt[0] == "--sum":
-        agg = "SUM"
-    else:
-        agg = "COUNT"
-        
-    sql_query = "SELECT " + agg + "(" + inpt[1] + ")" + " FROM " + info[1] + " WHERE " + query.parse_flags(inpt[2:])
+
+def count(inpt, info):
+    aggregate("COUNT", inpt, info)
+
+
+def average(inpt, info):
+    aggregate("AVG", inpt, info)  
+
+
+def aggregate(agg, inpt, info):
+    sql_query = "SELECT " + agg + "(" + inpt[0] + ")" + " FROM " + info[1] + " WHERE " + query.parse_flags(inpt[1:])
 
     columns, results = query.execute_sql(info[0], sql_query)
     dataprint.table(columns, results)
@@ -101,9 +104,15 @@ def close_out(inpt, info):
 
 
 def cmd_help(inpt, info):
-    print(statics.HELP)
+    print("    " + statics.VERSION + " '" + info[1] + "' supported flags: ")
+
+    for i in statics.HOST_SET[info[1]]:
+        print(statics.FLAG_HELP[i])
+
+    print(statics.HELP_STANDARD)
 
     if len(inpt) > 0:
-        print(statics.TEXT[inpt[0]])
+        print("\n    Command help '" + inpt[0] + "': ")
+        print(statics.HELP_TEXT[inpt[0]])
 
     input(statics.PAUSE)

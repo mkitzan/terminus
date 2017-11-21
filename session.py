@@ -96,14 +96,14 @@ def clear_screen():
         
         
 def resize():
-    if os.system == "nt":
+    if os.name == "nt":
         print("todo")
     else:
         os.system("resize -s " + str(statics.HEIGHT) + " " + str(statics.WIDTH))
 
 
 def title():
-    if os.system == "posix":
+    if os.name == "posix":
         os.system("echo -e '\033]2;'" + statics.VERSION + "'\007'")
     else:
         os.system("title " + statics.VERSION)
