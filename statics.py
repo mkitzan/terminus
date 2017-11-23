@@ -1,14 +1,15 @@
+VERSION = "Terminus v1.2"
+
+WIDTH = 125
+BOUNDS = 35
+HEIGHT = 35
+
 PAUSE = "\nPress Enter to continue..."
 
 FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-y": "Year", "-p": "Pages", "-f": "Format", "-F": "Finished", 
          "-c": "Collection", "-q": "Quote", "-d": "Date", "-o": "Operation",
          "-h": "Host", "-u": "User", "-A": "Arguments"}
-
-ALL_COLUMNS = ["Title", "Author", "Genre", "Year",
-               "Pages", "Type", "Format", "Finished",
-               "Collection", "Quote", "Date", "Operation",
-               "Arguments", "Host", "User"]
 
 HOST_SET = {"books": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Format", "Finished"],
             "stories": ["Title", "Author", "Genre", "Year", "Pages", "Collection", "Finished"],
@@ -25,25 +26,19 @@ FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
              "Finished": "        -F or --finished    flag specifies whether the book's been finished",
              "Collection": "        -c or --collection  flag specifies a short story's collection",
              "Quote": "        -q or --quote       flag specifies a book quote",
-             "Date": "        -d or --date        flag specifies the date in day/mon/year hr:mi:sc",
+             "Date": "        -d or --date        flag specifies the date in day/mon/year hr:mn:sc",
              "User": "        -u or --user        flag specifies the user",
              "Operation": "        -o or --operation   flag specifies the operation used",
              "Host": "        -h or --host        flag specifies the host",
              "Arguments": "        -A or --arguments   flag specifies the command arguments"}
-            
-VERSION = "Terminus v1.1"
-
-WIDTH = 125
-BOUNDS = 35
-HEIGHT = 35
 
 HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short stories""", 
              "insert": """        Flag order is important for insert
-        Example: insert -t Labryinths -a Jorge Luis Borges -g sf -y 1962 -p 251 -T short stories -f paperback -F false""", 
+        Example: insert -t Labryinths -a Jorge Luis Borges -g science fiction -y 1962 -p 251 -T short stories -f paperback -F false""", 
              "remove": """        Example: remove -t Man Plus""",
              "complete": """        Example: complete -t A Scanner Darkly""", 
              "sum": """        Example: sum pages -T short stories""", 
-             "count": """        Example: count titles -F true""",
+             "count": """        Example: count title -F true""",
              "average": """        Example: average year -g science fiction""", 
              "change": """        Change has two additional flags:
             -h or --host    specifies name of new host table
@@ -60,6 +55,10 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
             
         Example: upload /file/path/if/not/in/curr/directory/test_upload.csv
         If an item in the upload has a column value with a comma, insert that item individually""", 
+             "stats": """        Stats produces a table of statistics for a search query. All agruments are processed as a 'search' command.
+        Statistics table includes a row count, unique item count, sum, average, standard deviation, minimum, and maximum.
+
+        Example: stats -g science fiction -y 19??""",
              "exit": """        Exit takes no arguments used to safely leave the program"""}
 
 HELP_STANDARD = """
@@ -71,6 +70,7 @@ HELP_STANDARD = """
         count       performs COUNT SQL function
         average     performs AVG SQL function
         complete    changes finished column to 'true'
+        stats       outputs a statistics table on a 'search' command
         change      allows host table and user change
         upload      allows for bulk insert from CSV file
         exit        safely exits program

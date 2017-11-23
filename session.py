@@ -97,7 +97,7 @@ def clear_screen():
         
 def resize():
     if os.name == "nt":
-        print("todo")
+        print("mode con: cols=" + str(statics.WIDTH) + " lines=" + str(statics.HEIGHT))
     else:
         os.system("resize -s " + str(statics.HEIGHT) + " " + str(statics.WIDTH))
 

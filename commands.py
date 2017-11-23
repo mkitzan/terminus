@@ -4,6 +4,14 @@ import statics
 import dataprint
 
 
+def stats(inpt, info):
+    sql_query = query.parse_sql(inpt, info[1], "search")
+
+    columns, results = query.execute_sql(info[0], sql_query)
+    dataprint.statistics(columns, results)
+    input(statics.PAUSE)
+
+
 def insert(inpt, info):
     chunk = []
     bit = []

@@ -67,7 +67,7 @@ def run_command(command, info):
                  "exit": commands.close_out, "sum": commands.sum,
                  "count": commands.count, "average": commands.average,
                  "change": commands.change, "help": commands.cmd_help,
-                 "upload": commands.upload}
+                 "upload": commands.upload, "stats": commands.stats}
     
     if command[0] not in functions.keys():
         print("Invalid function '" + command[0] + "': enter 'help' for more information.")

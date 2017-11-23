@@ -55,6 +55,9 @@ Enter host table (books, stories, quotes, records). Begin normal use.
 - upload, performs a file upload from CSV to the current host table.
 
       user@host: upload /file/path/if/not/in/current/directory/test_upload.csv
+- stats, outputs a statistics table for a search query. All agruments are processed as a 'search' command.
+
+      user@host: stats -F true
 - help, displays general and host specific use information. 'help command_here' includes use information for that command.
 
       user@host: help upload
@@ -64,8 +67,11 @@ Enter host table (books, stories, quotes, records). Begin normal use.
    
 # Column/Flags
 'books' host table has 8 columns: title (-t), author (-a), genre (-g), year (-y), pages (-p), type (-T), format (-f), finished (-F)
+
 'stories' host table has 6 columns: title (-t), author (-a), genre (-g), year (-y), pages (-p), collection (-c), finished (-F)
+
 'quotes' host table has 4 columns: title (-t), author (-a), year (-y), quote (-q)
+
 'reocrds' host table has 5 columns: date (-d), user (-u), operation (-o), host (-h), arguments (-a)
 
 Type column/flag denotes whether the books is a novel, short stories...
