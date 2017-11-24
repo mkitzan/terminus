@@ -1,2 +1,2 @@
 @echo off
-python terminus.py
+python source/terminus.py

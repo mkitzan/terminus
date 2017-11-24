@@ -32,12 +32,12 @@ def random_quote(db):
 def home_screen(db):
     #font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=
     print("""
-      _______                  _                         __   ___   
-     |__   __|                (_)                       /_ | |__ \  
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| |    ) | 
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / |   / /  
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ / /_  
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)____|    
+      _______                  _                         __   ____  
+     |__   __|                (_)                       /_ | |___ \ 
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| |   __) |
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / |  |__ < 
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ ___) |
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)____/ 
      Terminal Library Database
     """)
 
@@ -56,8 +56,7 @@ def main():
 
     home_screen(info[0])
 
-    info[2] = session.change_user(info[0])
-    info[1] = session.change_host(info[0])
+    info[1], info[2] = session.login(info[0])
     
     query.landing(info)
     session.clear_screen()

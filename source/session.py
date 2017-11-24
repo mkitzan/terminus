@@ -33,59 +33,45 @@ def verify(db, username, password):
     curs = db.cursor()
     curs.execute("SELECT * FROM credentials WHERE Hash='" + hash_key + "'")
 
-    if curs.fetchone() is None:
-        curs.close()
-        return False
-    else:
-        curs.close()
-        return True
+    valid = (False if curs.fetchone() is None else True)
+    curs.close()
+    
+    return valid
 
 
-def change_user(db):
+def login(db):
     valid = False
 
     while not valid:
-        clear_screen()
+        clear_screen()     
         user = input("Username: ")
         password = getpass.getpass("Password: ")
-        clear_screen()
 
         valid = verify(db, user, password)
         if not valid:
-            print("Invalid login credentials")
-            input()
+            input(statics.LOGIN_ERROR)
+            continue
+        
+        host = input("    Host: ")
 
-    return user
+        valid = change_host(db, host)
+        if not valid:
+            input(statics.HOST_ERROR)
+
+    return host, user
 
 
-def direct_host_change(db, host):
+def change_host(db, host):
     if host == "sqlite_master" or host == "credentials":
         return False
 
     curs = db.cursor()
     curs.execute("SELECT name FROM sqlite_master WHERE name='" + host + "'")
     
-    if curs.fetchone() is not None:
-        curs.close()
-        return True
-    else:
-        curs.close()
-        return False
-
-
-def change_host(db):
-    valid = False
-
-    while not valid:
-        clear_screen()
-        host = input("Enter Host: ")
-
-        valid = direct_host_change(db, host)
-        if not valid:
-            print("Invalid host table")
-            input()
-
-    return host
+    valid = (False if curs.fetchone() is None else True)
+    curs.close()
+    
+    return valid
 
 
 def clear_screen():

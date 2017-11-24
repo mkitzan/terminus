@@ -91,17 +91,17 @@ def change(inpt, info):
 
     for i in range(length):
         if (inpt[i] == "-h" or inpt[i] == "--host") and i+1 < length:
-            if session.direct_host_change(info[0], inpt[i+1]) is True:
+            if session.change_host(info[0], inpt[i+1]):
                 info[1] = inpt[i+1]
             else:
-                print("Invalid host input")
+                input(statics.HOST_ERROR.strip("\n"))
                 return
             i += 1
         elif (inpt[i] == "-u" or inpt[i] == "--user") and i+2 < length:
-            if session.verify(info[0], inpt[i+1], inpt[i+2]) is True:
+            if session.verify(info[0], inpt[i+1], inpt[i+2]):
                 info[2] = inpt[i+1]
             else:
-                print("Invalid user input")
+                input(statics.LOGIN_ERROR.strip("\n"))
                 return
             i += 2
 
@@ -121,6 +121,6 @@ def cmd_help(inpt, info):
 
     if len(inpt) > 0:
         print("\n    Command help '" + inpt[0] + "': ")
-        print(statics.HELP_TEXT[inpt[0]])
+        print(statics.HELP_TEXT[inpt[0]] if inpt[0] in query.FUNCTIONS.keys() else statics.CMD_ERROR)
 
     input(statics.PAUSE)

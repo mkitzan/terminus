@@ -3,6 +3,14 @@ import commands
 import statics
 
 
+FUNCTIONS = {"search": commands.search, "insert": commands.insert,
+             "remove": commands.remove, "complete": commands.complete,
+             "exit": commands.close_out, "sum": commands.sum,
+             "count": commands.count, "average": commands.average,
+             "change": commands.change, "help": commands.cmd_help,
+             "upload": commands.upload, "stats": commands.stats}
+
+
 def execute_sql(db, sql_query):
     curs = db.cursor()
     
@@ -62,27 +70,18 @@ def parse_sql(args, host, operation):
 
 def run_command(command, info):
     command = command.split(" ")
-    functions = {"search": commands.search, "insert": commands.insert,
-                 "remove": commands.remove, "complete": commands.complete,
-                 "exit": commands.close_out, "sum": commands.sum,
-                 "count": commands.count, "average": commands.average,
-                 "change": commands.change, "help": commands.cmd_help,
-                 "upload": commands.upload, "stats": commands.stats}
     
-    if command[0] not in functions.keys():
-        print("Invalid function '" + command[0] + "': enter 'help' for more information.")
+    if command[0] not in FUNCTIONS.keys():
+        input("\nInvalid function '" + command[0] + "': enter 'help' for more information.")
     else:
         print()
         try:
             session.create_record(command, info)
-            functions[command[0]](command[1:], info)
+            FUNCTIONS[command[0]](command[1:], info)
         except:
             input("Error occurred while executing.\nTry: help " + (command[0] if command[0] != "help" else ""))
 
-    if command[0] == "exit":
-        return False
-    else:
-        return True
+    return False if command[0] == "exit" else True
 
 
 def landing(info):

@@ -1,10 +1,13 @@
-VERSION = "Terminus v1.2"
+VERSION = "Terminus v1.3"
 
 WIDTH = 125
 BOUNDS = 35
 HEIGHT = 35
 
 PAUSE = "\nPress Enter to continue..."
+HOST_ERROR = "\nInvalid host input"
+LOGIN_ERROR = "\nInvalid login credentials"
+CMD_ERROR = "        Invalid command"
 
 FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-y": "Year", "-p": "Pages", "-f": "Format", "-F": "Finished", 
