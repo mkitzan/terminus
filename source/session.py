@@ -7,12 +7,6 @@ import query
 import statics
 
 
-def new_user(inpt, connection):
-    sql_query = "INSERT INTO credentials VALUES('" + hash_credentials(inpt[0], inpt[1]) + "')"
-    query.execute_sql(connection, sql_query)
-    connection.commit()
-
-
 def create_record(inpt, info):
     sql_query = "INSERT INTO records VALUES('" + time.strftime("%d/%m/%Y %H:%M:%S") + "', '" + info[2] + "', '" + \
                 inpt[0] + "', '" + info[1] + "', '" + " ".join(inpt[1:]) + "')"
@@ -44,19 +38,22 @@ def login(db):
 
     while not valid:
         clear_screen()     
-        user = input("Username: ")
-        password = getpass.getpass("Password: ")
+        user = input(statics.GET_USER)
+        password = getpass.getpass(statics.GET_PW)
 
         valid = verify(db, user, password)
         if not valid:
             input(statics.LOGIN_ERROR)
             continue
         
-        host = input("    Host: ")
+        if statics.DEFAULT_HOST is None:
+            host = input("    Host: ")
 
-        valid = change_host(db, host)
-        if not valid:
-            input(statics.HOST_ERROR)
+            valid = change_host(db, host)
+            if not valid:
+                input(statics.HOST_ERROR)
+        else:
+            host = statics.DEFAULT_HOST
 
     return host, user
 
@@ -74,25 +71,24 @@ def change_host(db, host):
     return valid
 
 
-def clear_screen():
+def system_vars():
     if os.name == "nt":
-        os.system("cls")
-    else:
-        os.system("clear")
+        statics.CLEAR = "cls"
+        statics.RESIZE = "mode con: cols=" + str(statics.WIDTH) + " lines=" + str(statics.HEIGHT)
+    elif os.name == "posix":
+        statics.TERMINAL_TITLE = "echo -e '\033]2;'" + statics.VERSION + "'\007'"  
+
+
+def clear_screen():
+    os.system(statics.CLEAR)
         
         
 def resize():
-    if os.name == "nt":
-        print("mode con: cols=" + str(statics.WIDTH) + " lines=" + str(statics.HEIGHT))
-    else:
-        os.system("resize -s " + str(statics.HEIGHT) + " " + str(statics.WIDTH))
+    os.system(statics.RESIZE)
 
 
 def title():
-    if os.name == "posix":
-        os.system("echo -e '\033]2;'" + statics.VERSION + "'\007'")
-    else:
-        os.system("title " + statics.VERSION)
+    os.system(statics.TERMINAL_TITLE)
 
 
 def get_connection():

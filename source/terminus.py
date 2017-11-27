@@ -30,16 +30,7 @@ def random_quote(db):
 
 
 def home_screen(db):
-    #font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=
-    print("""
-      _______                  _                         __   ____  
-     |__   __|                (_)                       /_ | |___ \ 
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| |   __) |
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / |  |__ < 
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ ___) |
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)____/ 
-     Terminal Library Database
-    """)
+    print(statics.TITLE)
 
     random_quote(db)
     input(statics.PAUSE)
@@ -50,7 +41,7 @@ def main():
     session.title()
     session.resize()
     session.clear_screen()
-
+    
     info = [None, None, None]
     info[0] = session.get_connection()
 
@@ -64,4 +55,5 @@ def main():
 
 
 if __name__ == '__main__':
+    session.system_vars()
     main()

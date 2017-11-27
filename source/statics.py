@@ -1,8 +1,21 @@
-VERSION = "Terminus v1.3"
+VERSION = "Terminus v1.4"
+
+#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=
+TITLE = """
+      _______                  _                         __ _  _   
+     |__   __|                (_)                       /_ | || |  
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| | || |_ 
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / |__   _|
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ | |  
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)|_|
+     Terminal Library Database
+    """
 
 WIDTH = 125
 BOUNDS = 35
 HEIGHT = 35
+
+DEFAULT_HOST = "books"
 
 PAUSE = "\nPress Enter to continue..."
 HOST_ERROR = "\nInvalid host input"
@@ -37,7 +50,7 @@ FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
 
 HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short stories""", 
              "insert": """        Flag order is important for insert
-        Example: insert -t Labryinths -a Jorge Luis Borges -g science fiction -y 1962 -p 251 -T short stories -f paperback -F false""", 
+        Example: insert -t Labryinths -a Jorge Luis Borges -g science fiction -y 1962 -p 251 -T stories -f paperback -F false""", 
              "remove": """        Example: remove -t Man Plus""",
              "complete": """        Example: complete -t A Scanner Darkly""", 
              "sum": """        Example: sum pages -T short stories""", 
@@ -82,3 +95,35 @@ HELP_STANDARD = """
         '*' or '%'  select any amount of characters
         '?' or '_'  select a single character"""
 
+SETUP_OPTIONS = """ Set-up Options
+        
+Create a new user:    [user]
+Create a new table:   [table]
+Open help page:       [help]
+Safely exit set-up:   [exit]
+"""
+        
+SETUP_HELP = """Set-up allows for the creation of new attributes for Terminus
+    \tEnter command 'user' to start creating a new user
+    \tEnter command 'table' to start creating a new table
+    \tEnter command 'exit' to safely leave the program
+    \tEnter command 'help' to show this page again"""
+    
+SQLITE3 = """Be sure to have SQLite3 installed on your system.
+          You can download the latest version at 'https://www.sqlite.org/download.html'
+          """
+HAS_SQLITE3 = "Do you have SQLite3 installed on this machine? [Y/n]: "
+
+GET_USER = "Username: "
+GET_PW = "Password: "
+
+NEW_USER = "Enter new username: "
+NEW_PW = "Enter new password: "
+CONFIRM_PW = "Confirm new password: "
+
+SETUP_MSG = "     System Set-Up"
+CLOSE = "\nDatabase connection closed"
+
+CLEAR = "clear"
+RESIZE = "resize -s " + str(HEIGHT) + " " + str(WIDTH)
+TERMINAL_TITLE = "title " + VERSION
