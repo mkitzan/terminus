@@ -8,7 +8,7 @@ FUNCTIONS = {"search": commands.search, "insert": commands.insert,
              "exit": commands.close_out, "sum": commands.sum,
              "count": commands.count, "average": commands.average,
              "change": commands.change, "help": commands.cmd_help,
-             "upload": commands.upload, "stats": commands.stats}
+             "upload": commands.upload, "stats": commands.cmd_stats}
 
 
 def execute_sql(db, sql_query):
@@ -57,13 +57,8 @@ def parse_flags(args):
 
 def parse_sql(args, host, operation):
     where = parse_flags(args)
-
-    if operation == "remove":
-        sql_query = "DELETE FROM " + host
-    elif operation == "complete":
-        sql_query = "UPDATE " + host + " SET Finished='true'"
-    else:
-        sql_query = "SELECT " + ", ".join(statics.HOST_SET[host]) + " FROM " + host
+    
+    sql_query = statics.PARSE.setdefault(operation, lambda h: "SELECT " + ", ".join(statics.HOST_SET[host]) + " FROM " + host)(host)
 
     return sql_query + " WHERE " + where
 
@@ -78,8 +73,8 @@ def run_command(command, info):
         try:
             session.create_record(command, info)
             FUNCTIONS[command[0]](command[1:], info)
-        except:
-            input("Error occurred while executing.\nTry: help " + (command[0] if command[0] != "help" else ""))
+        except Exception as e:
+            input(str(e) + "\nTry: help " + (command[0] if command[0] != "help" else ""))
 
     return False if command[0] == "exit" else True
 

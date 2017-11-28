@@ -39,7 +39,6 @@ def home_screen(db):
 
 def main():
     session.title()
-    session.resize()
     session.clear_screen()
     
     info = [None, None, None]

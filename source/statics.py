@@ -1,26 +1,34 @@
-VERSION = "Terminus v1.4"
+VERSION = "Terminus v1.5"
 
-#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=
+#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v1.6
 TITLE = """
-      _______                  _                         __ _  _   
-     |__   __|                (_)                       /_ | || |  
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| | || |_ 
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / |__   _|
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ | |  
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)|_|
+      _______                  _                         __   _____ 
+     |__   __|                (_)                       /_ | | ____|
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| | | |__  
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / | |___ \ 
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ ___) |
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)____/ 
      Terminal Library Database
     """
+
+DB = "library.db"
 
 WIDTH = 125
 BOUNDS = 35
 HEIGHT = 35
+PROGRESS = 35
 
 DEFAULT_HOST = "books"
 
-PAUSE = "\nPress Enter to continue..."
+PAUSE = "\nPress enter to continue..."
 HOST_ERROR = "\nInvalid host input"
 LOGIN_ERROR = "\nInvalid login credentials"
 CMD_ERROR = "        Invalid command"
+
+BLOCKED = ["sqlite_master", "credentials"]
+
+PARSE = {"remove": lambda h: "DELETE FROM " + h,
+         "complete": lambda h: "UPDATE " + h + " SET Finished='true'"}
 
 FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-y": "Year", "-p": "Pages", "-f": "Format", "-F": "Finished", 
@@ -71,7 +79,7 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
             
         Example: upload /file/path/if/not/in/curr/directory/test_upload.csv
         If an item in the upload has a column value with a comma, insert that item individually""", 
-             "stats": """        Stats produces a table of statistics for a search query. All agruments are processed as a 'search' command.
+             "stats": """        Stats produces a table of statistics for a search query. All arguments are processed as a 'search' command.
         Statistics table includes a row count, unique item count, sum, average, standard deviation, minimum, and maximum.
 
         Example: stats -g science fiction -y 19??""",
@@ -110,12 +118,13 @@ SETUP_HELP = """Set-up allows for the creation of new attributes for Terminus
     \tEnter command 'help' to show this page again"""
     
 SQLITE3 = """Be sure to have SQLite3 installed on your system.
-          You can download the latest version at 'https://www.sqlite.org/download.html'
+You can download the latest version at 'https://www.sqlite.org/download.html'
           """
 HAS_SQLITE3 = "Do you have SQLite3 installed on this machine? [Y/n]: "
 
 GET_USER = "Username: "
 GET_PW = "Password: "
+GET_HOST = "    Host: "
 
 NEW_USER = "Enter new username: "
 NEW_PW = "Enter new password: "
@@ -125,5 +134,4 @@ SETUP_MSG = "     System Set-Up"
 CLOSE = "\nDatabase connection closed"
 
 CLEAR = "clear"
-RESIZE = "resize -s " + str(HEIGHT) + " " + str(WIDTH)
 TERMINAL_TITLE = "title " + VERSION

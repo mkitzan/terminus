@@ -1,5 +1,5 @@
 # Terminus: Terminal Library Database
-The third iteration of my terminal based library database. Unlike the previous java versions this one is written in python.
+The third iteration of the terminal based library database. Unlike the previous java versions this one is written in python.
 With each iteration, I have overhauled the interface style. Terminus is a pure bash experience. 
 Flags are finally supported rather than weird file path syntax: python was chosen to make flag processing easier.
 The previous versions had, to varying degrees of severity, input syntax dissonance where no truly uniform command input syntax existed. 
@@ -12,6 +12,7 @@ In previous versions it would have been a nightmare to integrate new table into 
 - 12 command functions including: file upload, the aggregate trinity...
 - User/password system
 - Full wildcard support
+- Case insensitive searching
 - 8 data points for 'books', 6 data points for 'stories', 4 data points for 'quotes', and 5 data points for 'records'
 - The Litany Against Fear
 
@@ -19,13 +20,13 @@ In previous versions it would have been a nightmare to integrate new table into 
 - Download files, create a directory for Terminus (consider creating a desktop shortcut to one of the start-up scripts)
 - Make sure you have sqlite3 installed on your machine (https://www.sqlite.org/download.html)
 - Run set-up.py from terminal, it will prompt you to create a new user
-- Create a CSV of your current library using the expected column ordering format (title, author, genre, year, pages, type, format, finished)
+- Create a CSV of your current library using the expected column ordering format (title, author, genre, year, pages, type, format, finished).
+Beware of single quotes, SQL syntax expects two single quotes ('') in the place of a one single quote (')
 - Execute an 'upload' command
 
 # General Use
 Either run python3 terminus.py, or one of the scripts to launch the program. 
-Enter the username/password you created in the initial set-up.
-Enter host table (books, stories, quotes, records). Begin normal use.
+Enter the username/password you created in the initial set-up. Begin normal use.
 
 # Command List
 - search, searches the current host table. The flag inputs constitute the SQL WHERE clause.
@@ -33,13 +34,13 @@ Enter host table (books, stories, quotes, records). Begin normal use.
       user@host: search -a Harlan Ellison -T short stories
 - insert, inserts a new record into the host table. Currently, it's flag order specific, run 'help insert' for more information.
 
-      user@host: insert -t Labryinths -a Jorge Luis Borges -g sf -y 1962 -p 251 -T short stories -f paperback -F false
+      user@host: insert -t Labryinths -a Jorge Luis Borges -g sf -y 1962 -p 251 -T stories -f paperback -F false
 - remove, deletes records from host table. The flag inputs constitute the SQL WHERE clause.
 
       user@host: remove -t Man Plus
 - complete, sets the 'finished' column to true. The flag inputs constitute the SQL WHERE clause.
 
-      user@host: complete -t A Scanner Darkly
+      user@host: complete -t The Big Time
 - sum, performs the SQL SUM aggregation.
 
       user@host: sum pages -t short stories
@@ -54,7 +55,7 @@ Enter host table (books, stories, quotes, records). Begin normal use.
       user@host: change -h short stories -u test_user pw1234
 - upload, performs a file upload from CSV to the current host table.
 
-      user@host: upload /file/path/if/not/in/current/directory/test_upload.csv
+      user@host: upload /directory/path/test_upload.csv
 - stats, outputs a statistics table for a search query. All agruments are processed as a 'search' command.
 
       user@host: stats -F true

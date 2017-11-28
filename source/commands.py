@@ -3,27 +3,34 @@ import query
 import statics
 import dataprint
 
+from math import ceil
 
-def stats(inpt, info):
+
+def cmd_stats(inpt, info):
     sql_query = query.parse_sql(inpt, info[1], "search")
 
     columns, results = query.execute_sql(info[0], sql_query)
-    dataprint.datastats(columns, results)
+    dataprint.stats(columns, results)
     input(statics.PAUSE)
 
 
-def insert(inpt, info):
-    chunk = []
-    bit = []
+def repackage(inpt):
+    cols = []
+    vals = ""
     for i in inpt[1:]:
-        if "-" in str(i):
-            chunk.append(bit)
-            bit = []
+        curr = i[1:3] if len(i) > 2 else i
+        if curr in statics.FLAGS.keys():
+            cols += [vals[:-1]]
+            vals = ""
         else:
-            bit.append(str(i))
-    chunk.append(bit)
-
-    inpt = [" ".join(i) for i in chunk]
+            vals += str(i) + " "
+    cols += [vals[:-1]]
+    
+    return cols
+    
+    
+def insert(inpt, info):
+    inpt = repackage(inpt)
 
     sql_query = "INSERT INTO " + info[1] + \
                 "(" + ", ".join(statics.HOST_SET[info[1]]) + ") VALUES ('" + "', '".join(inpt) + "')"
@@ -32,16 +39,33 @@ def insert(inpt, info):
 
 
 def upload(inpt, info):
+    file_len = 0
+    for line in open(inpt[0], "r"):
+        file_len += 1
+
     with open(inpt[0], "r") as file:
         row = file.readline()
+        curr = 1
+        
         while row:
-            row = row.strip("\n").split(",")
-            sql_query = "INSERT INTO " + info[1] + "(" + ", ".join(statics.HOST_SET[info[1]]) + ")" \
-                                                   " VALUES('" + "', '".join(row) + "')"
-            query.execute_sql(info[0], sql_query)
-            info[0].commit()
+            ratio = curr / file_len
+            progress = ceil(ratio * statics.PROGRESS)
+            ratio = ceil(ratio * 100)
+            row = row.strip("\n").replace(",", "', '")
 
+            session.clear_screen()
+            print(info[2] + "@" + info[1] + ": " + "upload " + inpt[0]) 
+            print("\n    |" + ("#" * progress) + (" " * (statics.PROGRESS - progress)) + "|  " + str(ratio) + "%")
+            print("\n    '" + row + "'")
+            
+            sql_query = "INSERT INTO " + info[1] + "(" + ", ".join(statics.HOST_SET[info[1]]) + ")" \
+                                                   " VALUES('" + row + "')"
+            query.execute_sql(info[0], sql_query)
+    
+            curr += 1
             row = file.readline()
+    
+    info[0].commit()
 
 
 def remove(inpt, info):
@@ -97,6 +121,7 @@ def change(inpt, info):
                 input(statics.HOST_ERROR.strip("\n"))
                 return
             i += 1
+        
         elif (inpt[i] == "-u" or inpt[i] == "--user") and i+2 < length:
             if session.verify(info[0], inpt[i+1], inpt[i+2]):
                 info[2] = inpt[i+1]

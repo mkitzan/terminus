@@ -1,7 +1,8 @@
 import session
 import query
-import getpass
 import statics
+
+from getpass import getpass
 
 
 def help():
@@ -45,8 +46,8 @@ def get_user():
     while not match:
         session.clear_screen()
         user = input(statics.NEW_USER)
-        password = getpass.getpass(statics.NEW_PW)
-        confirm = getpass.getpass(statics.CONFIRM_PW)
+        password = getpass(statics.NEW_PW)
+        confirm = getpass(statics.CONFIRM_PW)
     
         match = True if password == confirm else False
 
@@ -68,7 +69,6 @@ def get_command():
 
 def main():
     session.title()
-    session.resize()
     session.clear_screen()
     
     print(statics.TITLE)

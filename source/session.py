@@ -1,21 +1,23 @@
-import os
-import hashlib
-import sqlite3
-import getpass
-import time
 import query
 import statics
 
+from sqlite3 import connect
+from os import name
+from os import system 
+from hashlib import sha256
+from getpass import getpass
+from time import strftime
+
 
 def create_record(inpt, info):
-    sql_query = "INSERT INTO records VALUES('" + time.strftime("%d/%m/%Y %H:%M:%S") + "', '" + info[2] + "', '" + \
+    sql_query = "INSERT INTO records VALUES('" + strftime("%d/%m/%Y %H:%M:%S") + "', '" + info[2] + "', '" + \
                 inpt[0] + "', '" + info[1] + "', '" + " ".join(inpt[1:]) + "')"
     query.execute_sql(info[0], sql_query)
     info[0].commit()
 
 
 def hash_credentials(text, key):
-    hasher = hashlib.sha256()
+    hasher = sha256()
     hasher.update(bytes(text+key, "utf-8"))
     
     return hasher.hexdigest()
@@ -39,15 +41,15 @@ def login(db):
     while not valid:
         clear_screen()     
         user = input(statics.GET_USER)
-        password = getpass.getpass(statics.GET_PW)
+        password = getpass(statics.GET_PW)
 
         valid = verify(db, user, password)
         if not valid:
             input(statics.LOGIN_ERROR)
             continue
         
-        if statics.DEFAULT_HOST is None:
-            host = input("    Host: ")
+        if statics.DEFAULT_HOST is None or statics.DEFAULT_HOST in statics.BLOCKED:
+            host = input(statics.GET_HOST)
 
             valid = change_host(db, host)
             if not valid:
@@ -59,7 +61,7 @@ def login(db):
 
 
 def change_host(db, host):
-    if host == "sqlite_master" or host == "credentials":
+    if host in statics.BLOCKED:
         return False
 
     curs = db.cursor()
@@ -72,24 +74,19 @@ def change_host(db, host):
 
 
 def system_vars():
-    if os.name == "nt":
+    if name == "nt":
         statics.CLEAR = "cls"
-        statics.RESIZE = "mode con: cols=" + str(statics.WIDTH) + " lines=" + str(statics.HEIGHT)
-    elif os.name == "posix":
+    elif name == "posix":
         statics.TERMINAL_TITLE = "echo -e '\033]2;'" + statics.VERSION + "'\007'"  
 
 
 def clear_screen():
-    os.system(statics.CLEAR)
-        
-        
-def resize():
-    os.system(statics.RESIZE)
+    system(statics.CLEAR)
 
 
 def title():
-    os.system(statics.TERMINAL_TITLE)
+    system(statics.TERMINAL_TITLE)
 
 
 def get_connection():
-    return sqlite3.connect("library.db")
+    return connect(statics.DB)

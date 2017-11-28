@@ -65,13 +65,13 @@ def process(values):
         for key in SFUNCTS.keys():
             try:
                 stats[SFUNCTS[key][0]] += [SFUNCTS[key][1](column)]
-            except:
+            except Exception:
                 stats[SFUNCTS[key][0]] += [NVALID]
 
     return stats
 
 
-def datastats(columns, values, edge="*", buffer_val=1, rounding=4, nvalid="-"):
+def stats(columns, values, edge="*", buffer_val=1, rounding=4, nvalid="-"):
     ROUND = rounding
     NVALID = nvalid
     
