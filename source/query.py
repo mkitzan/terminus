@@ -8,7 +8,8 @@ FUNCTIONS = {"search": commands.search, "insert": commands.insert,
              "exit": commands.close_out, "sum": commands.sum,
              "count": commands.count, "average": commands.average,
              "change": commands.change, "help": commands.cmd_help,
-             "upload": commands.upload, "stats": commands.cmd_stats}
+             "upload": commands.upload, "stats": commands.cmd_stats,
+             "export": commands.export}
 
 
 def execute_sql(db, sql_query):
@@ -31,10 +32,17 @@ def sorting(args):
     index = (args.index("-s") if "-s" in args else args.index("--sort") if "--sort" in args else -1)
 
     if index != -1:
-        sort += " ORDER BY " + args.pop(index + 1)
-        args.pop(index)
-
-    return sort
+        sort += " ORDER BY "
+        end = 0
+        for i in range(index + 1, len(args)):
+            if (args[i][1:3] if len(args[i]) > 2 else args[i]) not in statics.FLAGS.keys():
+                sort += args[i] + ", "
+                end = i
+            else:
+                break
+        args[index:end+1] = []
+        
+    return sort[:-2]
 
 
 def parse_flags(args):

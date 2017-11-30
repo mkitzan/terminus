@@ -9,7 +9,7 @@ In previous versions it would have been a nightmare to integrate new table into 
 
 # Features
 - 3 library host tables (books, stories, quotes), and 1 administrative host table (records)
-- 12 command functions including: file upload, the aggregate trinity...
+- 13 command functions including: file upload, the aggregate trinity, query result export...
 - User/password system
 - Full wildcard support
 - Case insensitive searching
@@ -32,7 +32,7 @@ Enter the username/password you created in the initial set-up. Begin normal use.
 - search, searches the current host table. The flag inputs constitute the SQL WHERE clause.
 
       user@host: search -a Harlan Ellison -T short stories
-- insert, inserts a new record into the host table. Currently, it's flag order specific, run 'help insert' for more information.
+- insert, inserts a new record into the host table. Currently, it's not flag order specific, run 'help insert' for more information.
 
       user@host: insert -t Labryinths -a Jorge Luis Borges -g sf -y 1962 -p 251 -T stories -f paperback -F false
 - remove, deletes records from host table. The flag inputs constitute the SQL WHERE clause.
@@ -59,6 +59,10 @@ Enter the username/password you created in the initial set-up. Begin normal use.
 - stats, outputs a statistics table for a search query. All agruments are processed as a 'search' command.
 
       user@host: stats -F true
+- export, writes the output of both a 'search' and 'stats' call to a file (named 'd/m/y DB Export.txt'). 
+All arguments are processed as a 'search' command.
+        
+	  user@host: export -T stories -g science fiction -s author
 - help, displays general and host specific use information. 'help command_here' includes use information for that command.
 
       user@host: help upload
@@ -73,7 +77,7 @@ Enter the username/password you created in the initial set-up. Begin normal use.
 
 'quotes' host table has 4 columns: title (-t), author (-a), year (-y), quote (-q)
 
-'reocrds' host table has 5 columns: date (-d), user (-u), operation (-o), host (-h), arguments (-a)
+'reocrds' host table has 5 columns: date (-d), user (-u), operation (-o), host (-h), arguments (-A)
 
 Type column/flag denotes whether the books is a novel, short stories...
 

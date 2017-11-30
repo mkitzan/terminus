@@ -1,13 +1,13 @@
-VERSION = "Terminus v1.5"
+VERSION = "Terminus v1.6"
 
-#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v1.6
+#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v1.7
 TITLE = """
-      _______                  _                         __   _____ 
-     |__   __|                (_)                       /_ | | ____|
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| | | |__  
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / | |___ \ 
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ ___) |
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)____/ 
+      _______                  _                         __    __  
+     |__   __|                (_)                       /_ |  / /  
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| | / /_  
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / || '_ \ 
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| || (_) |
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)___/ 
      Terminal Library Database
     """
 
@@ -34,6 +34,8 @@ FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-y": "Year", "-p": "Pages", "-f": "Format", "-F": "Finished", 
          "-c": "Collection", "-q": "Quote", "-d": "Date", "-o": "Operation",
          "-h": "Host", "-u": "User", "-A": "Arguments"}
+         
+CAPS = {"--type": "-T", "--finished": "-F", "arguments": "-A"}
 
 HOST_SET = {"books": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Format", "Finished"],
             "stories": ["Title", "Author", "Genre", "Year", "Pages", "Collection", "Finished"],
@@ -57,7 +59,7 @@ FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
              "Arguments": "        -A or --arguments   flag specifies the command arguments"}
 
 HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short stories""", 
-             "insert": """        Flag order is important for insert
+             "insert": """        Flag order is not important for insert; however, all flags must be present
         Example: insert -t Labryinths -a Jorge Luis Borges -g science fiction -y 1962 -p 251 -T stories -f paperback -F false""", 
              "remove": """        Example: remove -t Man Plus""",
              "complete": """        Example: complete -t A Scanner Darkly""", 
@@ -77,12 +79,15 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
             quotes:     -t, -a, -y, -q
             records:    -d, -u, -o, -h, -A
             
-        Example: upload /file/path/if/not/in/curr/directory/test_upload.csv
+        Example: upload /directory/path/test_upload.csv
         If an item in the upload has a column value with a comma, insert that item individually""", 
              "stats": """        Stats produces a table of statistics for a search query. All arguments are processed as a 'search' command.
         Statistics table includes a row count, unique item count, sum, average, standard deviation, minimum, and maximum.
 
         Example: stats -g science fiction -y 19??""",
+             "export": """        Export writes the output of both a 'search' and 'stats' call to a unique file. All arguments are processed as a 'search' command
+        
+        Example: export -T stories -g science fiction -s author""",
              "exit": """        Exit takes no arguments used to safely leave the program"""}
 
 HELP_STANDARD = """
@@ -135,3 +140,7 @@ CLOSE = "\nDatabase connection closed"
 
 CLEAR = "clear"
 TERMINAL_TITLE = "title " + VERSION
+
+
+def ret_flag(inpt, i):
+    return (inpt[i][1:3] if inpt[i] not in CAPS.keys() else CAPS[inpt[i]]) if len(inpt[i]) > 2 else inpt[i]

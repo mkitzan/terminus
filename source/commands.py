@@ -14,26 +14,28 @@ def cmd_stats(inpt, info):
     input(statics.PAUSE)
 
 
-def repackage(inpt):
-    cols = []
-    vals = ""
-    for i in inpt[1:]:
-        curr = i[1:3] if len(i) > 2 else i
+def repackage(inpt, host):
+    cols = [-1] * len(statics.HOST_SET[host])
+    flag = 0
+
+    for i in range(len(inpt)):
+        curr = statics.ret_flag(inpt, i) if "-" == inpt[i][0] else ""
+
         if curr in statics.FLAGS.keys():
-            cols += [vals[:-1]]
-            vals = ""
-        else:
-            vals += str(i) + " "
-    cols += [vals[:-1]]
-    
+            cols[statics.HOST_SET[host].index(statics.FLAGS[statics.ret_flag(inpt, flag)])] = " ".join(inpt[flag+1:i])
+            flag = i
+
+    cols[statics.HOST_SET[host].index(statics.FLAGS[statics.ret_flag(inpt, flag)])] = " ".join(inpt[flag+1:])
+
     return cols
     
     
 def insert(inpt, info):
-    inpt = repackage(inpt)
+    inpt = repackage(inpt, info[1])
 
     sql_query = "INSERT INTO " + info[1] + \
                 "(" + ", ".join(statics.HOST_SET[info[1]]) + ") VALUES ('" + "', '".join(inpt) + "')"
+
     query.execute_sql(info[0], sql_query)
     info[0].commit()
 
@@ -100,6 +102,14 @@ def aggregate(agg, inpt, info):
     columns, results = query.execute_sql(info[0], sql_query)
     dataprint.table(columns, results)
     input(statics.PAUSE)
+    
+    
+def export(inpt, info):
+    args = [el for el in inpt]
+    sql_query = query.parse_sql(inpt, info[1], "search")
+
+    columns, results = query.execute_sql(info[0], sql_query)
+    dataprint.export(columns, results, info[1], " ".join(args))
 
 
 def search(inpt, info):

@@ -1,12 +1,16 @@
 import statistics
 
+from time import strftime
 
+
+PATH = ""
 NVALID = "-"
+MISSING = "Not Provided"
 ROUND = 4
-SFUNCTS = {"Count": [0, lambda x: len(x)], "Unique": [1, lambda x: len(set(x))], 
-           "Sum": [2, lambda x: sum(x)], "Minimum": [3, lambda x: NVALID if type(x[0]) is str else x[0]], 
-           "Maximum": [4, lambda x: NVALID if type(x[-1]) is str else x[-1]], "Mean": [5, lambda x: round(statistics.mean(x), ROUND)], 
-           "Median": [6, lambda x: statistics.median(x)], "Mode": [7, lambda x: statistics.mode(x)], 
+SFUNCTS = {"Count": [0, lambda x: len(x)], "Unique": [1, lambda x: len(set(x))],
+           "Sum": [2, lambda x: sum(x)], "Minimum": [3, lambda x: NVALID if type(x[0]) is str else x[0]],
+           "Maximum": [4, lambda x: NVALID if type(x[-1]) is str else x[-1]], "Mean": [5, lambda x: round(statistics.mean(x), ROUND)],
+           "Median": [6, lambda x: statistics.median(x)], "Mode": [7, lambda x: statistics.mode(x)],
            "Standard Deviation": [8, lambda x: round(statistics.stdev(x), ROUND)], "Variance": [9, lambda x: round(statistics.variance(x), ROUND)]}
 
 
@@ -14,8 +18,8 @@ def border(max_lens, edge):
     return "".join([edge + "-"*i for i in max_lens]) + edge
 
 
-def printer(values, val_bufs):
-    print("|" + "|".join([str(values[i]) + " " * val_bufs[i] for i in range(len(values))]) + "|")
+def make_row(values, val_bufs):
+    return "|" + "|".join([str(values[i]) + " " * val_bufs[i] for i in range(len(values))]) + "|"
 
 
 def buffers(columns, values, buffer_val):
@@ -33,26 +37,26 @@ def buffers(columns, values, buffer_val):
     return [[max_lens[i]+buffer_val - el[i] for i in range(len(el))] for el in val_lens], [i+buffer_val for i in max_lens]
 
 
-def print_data(tb_border, columns, values, val_bufs):
-    print(tb_border)
-    printer(columns, val_bufs[0])
-    print(tb_border)
+def print_data(tb_border, columns, values, val_bufs, funct):
+    funct(tb_border)
+    funct(make_row(columns, val_bufs[0]))
+    funct(tb_border)
 
     for i in range(len(values)):
-        printer(values[i], val_bufs[i + 1])
+        funct(make_row(values[i], val_bufs[i + 1]))
 
-    print(tb_border)
+    funct(tb_border)
 
 
-def table(columns, values, edge="*", buffer_val=1):
+def table(columns, values, edge="*", buffer_val=1, funct=print):
     val_bufs, max_lens = buffers(columns, values, buffer_val)
 
     tb_border = border(max_lens, edge)
 
-    print_data(tb_border, columns, values, val_bufs)
+    print_data(tb_border, columns, values, val_bufs, funct)
     
 
-def process(values):
+def process(values, columns):
     stats = [[-1] for el in SFUNCTS.keys()]
     for key in SFUNCTS.keys():
         stats[SFUNCTS[key][0]] = [key]
@@ -68,19 +72,44 @@ def process(values):
             except Exception:
                 stats[SFUNCTS[key][0]] += [NVALID]
 
-    return stats
+    if len(stats[0]) == 1:
+        for i in range(len(stats)):
+            stats[i] += [NVALID] * len(columns)
+    
+    columns = ["Statistic"] + columns
+
+    return stats, columns
 
 
-def stats(columns, values, edge="*", buffer_val=1, rounding=4, nvalid="-"):
-    ROUND = rounding
+def stats(columns, values, edge="*", buffer_val=1, remainder=4, nvalid="-", funct=print):
+    ROUND = remainder
     NVALID = nvalid
     
-    values = process(values)
+    values, columns = process(values, columns)
     
-    if len(values[0]) == 1:
-        for i in range(len(values)):
-            values[i] += [nvalid] * len(columns)
+    table(columns, values, edge, buffer_val, funct)
     
-    columns = ["Statistics"] + columns
     
-    table(columns, values, edge, buffer_val)
+def export(columns, values, host=MISSING, arguments=MISSING, edge="*", buffer_val=1, remainder=4, nvalid="-"):
+    ROUND = remainder
+    NVALID = nvalid
+    
+    print("    Status [1/3]: creating file, and writing header to file")
+    
+    expfile = open(PATH + strftime("%d-%m-%Y") + " DB Export.txt", "w+")
+    expfile.write(strftime("%d/%m/%Y %H:%M:%S") + "\n\n")
+    expfile.write("Host Table: " + host + "\nArguments: " + arguments + "\n\nResults Set\n")
+    
+    print("    Status [2/3]: writing results set to file")
+    
+    table(columns, values, edge, buffer_val, lambda x: expfile.write(x + "\n"))
+    
+    print("    Status [3/3]: writting statistics to file")
+    
+    expfile.write("\nResults Statistics\n")
+    stats(columns, values, edge, buffer_val, remainder, nvalid, lambda x: expfile.write(x + "\n"))
+    
+    expfile.close()
+    
+    
+    
