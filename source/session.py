@@ -44,14 +44,15 @@ def login(db):
         password = getpass(statics.GET_PW)
 
         valid = verify(db, user, password)
+        
         if not valid:
             input(statics.LOGIN_ERROR)
             continue
         
         if statics.DEFAULT_HOST is None or statics.DEFAULT_HOST in statics.BLOCKED:
             host = input(statics.GET_HOST)
-
             valid = change_host(db, host)
+            
             if not valid:
                 input(statics.HOST_ERROR)
         else:

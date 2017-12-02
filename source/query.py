@@ -9,19 +9,18 @@ FUNCTIONS = {"search": commands.search, "insert": commands.insert,
              "count": commands.count, "average": commands.average,
              "change": commands.change, "help": commands.cmd_help,
              "upload": commands.upload, "stats": commands.cmd_stats,
-             "export": commands.export}
+             "export": commands.export, "distinct": commands.distinct}
 
 
 def execute_sql(db, sql_query):
     curs = db.cursor()
-    
     curs.execute(sql_query)
     columns = None
+    
     if curs.description is not None:
         columns = [i[0] for i in curs.description]
         
     results = curs.fetchall()
-
     curs.close()
     
     return columns, results
@@ -34,12 +33,14 @@ def sorting(args):
     if index != -1:
         sort += " ORDER BY "
         end = 0
+        
         for i in range(index + 1, len(args)):
             if (args[i][1:3] if len(args[i]) > 2 else args[i]) not in statics.FLAGS.keys():
                 sort += args[i] + ", "
                 end = i
             else:
                 break
+                
         args[index:end+1] = []
         
     return sort[:-2]
@@ -47,12 +48,10 @@ def sorting(args):
 
 def parse_flags(args):
     where = ""
-
     sort = sorting(args)
 
     for i in range(len(args)):
         arg = str(args[i]).replace("*", "%").replace("?", "_")
-        
         curr = arg[1:3] if len(arg) > 2 else arg
 
         if curr in statics.FLAGS.keys():
@@ -65,8 +64,7 @@ def parse_flags(args):
 
 def parse_sql(args, host, operation):
     where = parse_flags(args)
-    
-    sql_query = statics.PARSE.setdefault(operation, lambda h: "SELECT " + ", ".join(statics.HOST_SET[host]) + " FROM " + host)(host)
+    sql_query = statics.PARSE.setdefault(operation, lambda h: "SELECT " + ", ".join(statics.HOST_SET[h]) + " FROM " + h)(host)
 
     return sql_query + " WHERE " + where
 
@@ -92,7 +90,5 @@ def landing(info):
 
     while not_done:
         session.clear_screen()
-
         command = input(info[2] + "@" + info[1] + ": ")
-        
         not_done = run_command(command, info)

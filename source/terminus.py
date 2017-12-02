@@ -5,7 +5,7 @@ import statics
 
 
 def format_quote(quote):
-    barrier = statics.WIDTH-statics.BOUNDS
+    barrier = statics.WIDTH - statics.BOUNDS
     length = len(quote)
 
     while barrier+statics.BOUNDS < length:
@@ -13,6 +13,7 @@ def format_quote(quote):
             if quote[barrier+i] == " ":
                 quote = quote[:barrier+i] + "\n " + quote[barrier+i:]
                 break
+
         barrier += statics.WIDTH-(statics.BOUNDS-20)
 
     return quote

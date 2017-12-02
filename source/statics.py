@@ -1,13 +1,13 @@
-VERSION = "Terminus v1.6"
+VERSION = "Terminus v1.7"
 
-#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v1.7
+#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v1.8
 TITLE = """
-      _______                  _                         __    __  
-     |__   __|                (_)                       /_ |  / /  
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| | / /_  
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / || '_ \ 
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| || (_) |
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)___/ 
+      _______                  _                         __  ______ 
+     |__   __|                (_)                       /_ ||____  |
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| |    / / 
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / |   / /  
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ / /   
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)_/  
      Terminal Library Database
     """
 
@@ -82,12 +82,17 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
         Example: upload /directory/path/test_upload.csv
         If an item in the upload has a column value with a comma, insert that item individually""", 
              "stats": """        Stats produces a table of statistics for a search query. All arguments are processed as a 'search' command.
-        Statistics table includes a row count, unique item count, sum, average, standard deviation, minimum, and maximum.
+        Statistics table includes a row count, unique item count, sum, average, standard deviation, minimum, and maximum
 
         Example: stats -g science fiction -y 19??""",
              "export": """        Export writes the output of both a 'search' and 'stats' call to a unique file. All arguments are processed as a 'search' command
         
         Example: export -T stories -g science fiction -s author""",
+             "distinct": """        Distinct allows for searching records with the distinct values in the specified column
+        Specific column is stated directly next to the 'distinct' command word
+        Unique flag '-C' or '--command' states how to run the arguments. Valid commands: 'search', 'stats', and 'export'
+        
+        Example: distinct title -F true -s author -C search""",
              "exit": """        Exit takes no arguments used to safely leave the program"""}
 
 HELP_STANDARD = """
@@ -102,6 +107,7 @@ HELP_STANDARD = """
         stats       outputs a statistics table on a 'search' command
         change      allows host table and user change
         upload      allows for bulk insert from CSV file
+        export      allows writing query output to a text file
         exit        safely exits program
         
     Terminus supports both GNU and SQL wildcards:

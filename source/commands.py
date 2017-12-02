@@ -109,7 +109,7 @@ def export(inpt, info):
     sql_query = query.parse_sql(inpt, info[1], "search")
 
     columns, results = query.execute_sql(info[0], sql_query)
-    dataprint.export(columns, results, info[1], " ".join(args))
+    dataprint.export(columns, results, info[1], "export " + " ".join(args))
 
 
 def search(inpt, info):
@@ -117,6 +117,47 @@ def search(inpt, info):
 
     columns, results = query.execute_sql(info[0], sql_query)
     dataprint.table(columns, results)
+    input(statics.PAUSE)
+    
+    
+def find_op(inpt):
+    for i in range(len(inpt)):
+        curr = inpt[i][1:3].upper() if len(inpt[i]) > 2 else inpt[i]
+        
+        if curr == "-C" and i+1 < len(inpt):
+            op = inpt[i+1]
+            inpt[i:i+2] = []
+            return op
+    
+    
+def distinct(inpt, info): 
+    op = find_op(inpt)
+        
+    sql_query = query.parse_sql(inpt[1:], info[1], "search")
+    
+    columns, results = query.execute_sql(info[0], sql_query)
+    pivot = columns.index(inpt[0].capitalize())
+    
+    dist = set()
+    dupl = []
+    for i in range(len(results)):
+        if results[i][pivot] in dist:
+            dupl += [i]
+        else:
+            dist = dist.union({results[i][pivot]})
+            
+    dupl.reverse()
+    for i in dupl:
+        results.pop(i)
+        
+    if op == "stats":
+        dataprint.stats(columns, results)
+    elif op == "export":
+        dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt))
+        return
+    elif op == "search":
+        dataprint.table(columns, results)
+
     input(statics.PAUSE)
 
 
@@ -130,14 +171,15 @@ def change(inpt, info):
             else:
                 input(statics.HOST_ERROR.strip("\n"))
                 return
+                
             i += 1
-        
         elif (inpt[i] == "-u" or inpt[i] == "--user") and i+2 < length:
             if session.verify(info[0], inpt[i+1], inpt[i+2]):
                 info[2] = inpt[i+1]
             else:
                 input(statics.LOGIN_ERROR.strip("\n"))
                 return
+                
             i += 2
 
 
