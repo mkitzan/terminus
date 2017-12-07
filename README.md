@@ -9,7 +9,7 @@ In previous versions it would have been a nightmare to integrate new table into 
 
 # Features
 - 3 library host tables (books, stories, quotes), and 1 administrative host table (records)
-- 13 command functions including: file upload, the aggregate trinity, query result export...
+- 14 command functions including: file upload, the aggregate trinity, query result export...
 - User/password system
 - Full wildcard support
 - Case insensitive searching
@@ -38,9 +38,9 @@ Enter the username/password you created in the initial set-up. Begin normal use.
 - remove, deletes records from host table. The flag inputs constitute the SQL WHERE clause.
 
       user@host: remove -t Man Plus
-- complete, sets the 'finished' column to true. The flag inputs constitute the SQL WHERE clause.
+- update, allows user to change field of a record. The flag inputs constitute the SQL WHERE clause.
 
-      user@host: complete -t The Big Time
+      user@host: update type stories -t City
 - sum, performs the SQL SUM aggregation.
 
       user@host: sum pages -t short stories

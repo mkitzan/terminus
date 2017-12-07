@@ -4,7 +4,7 @@ import statics
 
 
 FUNCTIONS = {"search": commands.search, "insert": commands.insert,
-             "remove": commands.remove, "complete": commands.complete,
+             "remove": commands.remove, "update": commands.update,
              "exit": commands.close_out, "sum": commands.sum,
              "count": commands.count, "average": commands.average,
              "change": commands.change, "help": commands.cmd_help,
@@ -64,6 +64,7 @@ def parse_flags(args):
 
 def parse_sql(args, host, operation):
     where = parse_flags(args)
+    
     sql_query = statics.PARSE.setdefault(operation, lambda h: "SELECT " + ", ".join(statics.HOST_SET[h]) + " FROM " + h)(host)
 
     return sql_query + " WHERE " + where
@@ -73,14 +74,14 @@ def run_command(command, info):
     command = command.split(" ")
     
     if command[0] not in FUNCTIONS.keys():
-        input("\nInvalid function '" + command[0] + "': enter 'help' for more information.")
+        input(statics.funct_err(command[0]))
     else:
         print()
         try:
             session.create_record(command, info)
             FUNCTIONS[command[0]](command[1:], info)
         except Exception as e:
-            input(str(e) + "\nTry: help " + (command[0] if command[0] != "help" else ""))
+            input(str(e) + statics.EXCEPT + (command[0] if command[0] != "help" else ""))
 
     return False if command[0] == "exit" else True
 

@@ -77,10 +77,27 @@ def remove(inpt, info):
     info[0].commit()
 
 
-def complete(inpt, info):
-    sql_query = query.parse_sql(inpt, info[1], "complete")
+def find_change(inpt):
+    change = inpt.pop(0).capitalize() + "='"
+    
+    for i in range(len(inpt)):
+        flg = statics.ret_flag(inpt, i)
+        if flg in statics.FLAGS:
+            change = change[:-1]
+            break
+        
+        change += str(inpt[i]) + " "
+            
+    change += "'"
+    inpt[:i] = []
+    return change
 
-    query.execute_sql(info[0], sql_query)
+
+def update(inpt, info):
+    criteria = "UPDATE " + info[1] + " SET " + find_change(inpt) + " WHERE "
+    where = query.parse_flags(inpt)
+
+    query.execute_sql(info[0], criteria + where)
     info[0].commit()
 
 
@@ -189,7 +206,7 @@ def close_out(inpt, info):
 
 
 def cmd_help(inpt, info):
-    print("    " + statics.VERSION + " '" + info[1] + "' supported flags: ")
+    print(statics.help1(info[1]))
 
     for i in statics.HOST_SET[info[1]]:
         print(statics.FLAG_HELP[i])
@@ -197,7 +214,7 @@ def cmd_help(inpt, info):
     print(statics.HELP_STANDARD)
 
     if len(inpt) > 0:
-        print("\n    Command help '" + inpt[0] + "': ")
+        print(statics.help2(inpt[0]))
         print(statics.HELP_TEXT[inpt[0]] if inpt[0] in query.FUNCTIONS.keys() else statics.CMD_ERROR)
 
     input(statics.PAUSE)

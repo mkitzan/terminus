@@ -1,34 +1,33 @@
-VERSION = "Terminus v1.7"
+VERSION = "Terminus v1.8"
 
-#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v1.8
+#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v1.9
 TITLE = """
-      _______                  _                         __  ______ 
-     |__   __|                (_)                       /_ ||____  |
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| |    / / 
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / |   / /  
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ / /   
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)_/  
+      _______                  _                         __   ___  
+     |__   __|                (_)                       /_ | / _ \ 
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| || (_) |
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / | > _ < 
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| || (_) |
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)___/
      Terminal Library Database
     """
 
 DB = "library.db"
+DEFAULT_HOST = "books"
 
 WIDTH = 125
 BOUNDS = 35
 HEIGHT = 35
 PROGRESS = 35
 
-DEFAULT_HOST = "books"
-
 PAUSE = "\nPress enter to continue..."
 HOST_ERROR = "\nInvalid host input"
 LOGIN_ERROR = "\nInvalid login credentials"
 CMD_ERROR = "        Invalid command"
+EXCEPT = "\nTry: help "
 
 BLOCKED = ["sqlite_master", "credentials"]
 
-PARSE = {"remove": lambda h: "DELETE FROM " + h,
-         "complete": lambda h: "UPDATE " + h + " SET Finished='true'"}
+PARSE = {"remove": lambda h: "DELETE FROM " + h}
 
 FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-y": "Year", "-p": "Pages", "-f": "Format", "-F": "Finished", 
@@ -62,7 +61,10 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
              "insert": """        Flag order is not important for insert; however, all flags must be present
         Example: insert -t Labryinths -a Jorge Luis Borges -g science fiction -y 1962 -p 251 -T stories -f paperback -F false""", 
              "remove": """        Example: remove -t Man Plus""",
-             "complete": """        Example: complete -t A Scanner Darkly""", 
+             "update": """        Update the first argument states the column where the update will take place, the next set states the change to be made
+        Finally, the last set ('-t A Scanner Darkly' in the example) states the where clause the perform the update by
+        
+        Example: update finish true -t A Scanner Darkly""", 
              "sum": """        Example: sum pages -T short stories""", 
              "count": """        Example: count title -F true""",
              "average": """        Example: average year -g science fiction""", 
@@ -85,7 +87,8 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
         Statistics table includes a row count, unique item count, sum, average, standard deviation, minimum, and maximum
 
         Example: stats -g science fiction -y 19??""",
-             "export": """        Export writes the output of both a 'search' and 'stats' call to a unique file. All arguments are processed as a 'search' command
+             "export": """        Export writes the output of both a 'search' and 'stats' call to a unique file. 
+        All arguments are processed as a 'search' command
         
         Example: export -T stories -g science fiction -s author""",
              "distinct": """        Distinct allows for searching records with the distinct values in the specified column
@@ -97,13 +100,14 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
 
 HELP_STANDARD = """
     Command list:
-        search      perform SELECT SQL function
+        search      performs SELECT SQL function
+        distinct    performs SELECT DISTINCT SQL function
         insert      performs INSERT INTO SQL function
         remove      performs DELETE SQL function
         sum         performs SUM SQL function
         count       performs COUNT SQL function
         average     performs AVG SQL function
-        complete    changes finished column to 'true'
+        update      performs the UPDATE SQL function
         stats       outputs a statistics table on a 'search' command
         change      allows host table and user change
         upload      allows for bulk insert from CSV file
@@ -150,3 +154,12 @@ TERMINAL_TITLE = "title " + VERSION
 
 def ret_flag(inpt, i):
     return (inpt[i][1:3] if inpt[i] not in CAPS.keys() else CAPS[inpt[i]]) if len(inpt[i]) > 2 else inpt[i]
+
+
+def funct_err(cmd): return "\nInvalid function '" + cmd + "': enter 'help' for more information."
+
+
+def help1(info): return "    " + VERSION + " '" + info + "' supported flags: "
+
+
+def help2(inpt): return "\n    Command help '" + inpt + "': "

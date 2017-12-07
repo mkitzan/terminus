@@ -101,7 +101,7 @@ def export(columns, values, tb=MISSING, args=MISSING, edge="*", buffer_val=1, re
     print("    Status [1/3]: creating file, and writing header to file")
     
     expfile = open(PATH + strftime("%d-%m-%Y") + " DB Export.txt", "w+")
-    expfile.write(strftime("%d/%m/%Y %H:%M:%S") + "\n\nHost Table: " + tb + "\nArguments: " + args + "\n\nResults Set\n")
+    expfile.write(strftime("%d/%m/%Y %H:%M:%S") + "\n\nHost Table: " + tb + "\nArguments:  " + args + "\n\nResults Set\n")
     
     print("    Status [2/3]: writing results set to file")
     
