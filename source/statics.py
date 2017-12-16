@@ -1,13 +1,13 @@
-VERSION = "Terminus v1.8"
+VERSION = "Terminus v1.9"
 
-#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v1.9
+#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.0
 TITLE = """
-      _______                  _                         __   ___  
-     |__   __|                (_)                       /_ | / _ \ 
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| || (_) |
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / | > _ < 
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| || (_) |
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)___/
+      _______                  _                         __  ___  
+     |__   __|                (_)                       /_ |/ _ \ 
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| | (_) |
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / |\__, |
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ / / 
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)_/ 
      Terminal Library Database
     """
 
@@ -33,7 +33,7 @@ FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-y": "Year", "-p": "Pages", "-f": "Format", "-F": "Finished", 
          "-c": "Collection", "-q": "Quote", "-d": "Date", "-o": "Operation",
          "-h": "Host", "-u": "User", "-A": "Arguments"}
-         
+        
 CAPS = {"--type": "-T", "--finished": "-F", "arguments": "-A"}
 
 HOST_SET = {"books": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Format", "Finished"],
@@ -64,7 +64,7 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
              "update": """        Update the first argument states the column where the update will take place, the next set states the change to be made
         Finally, the last set ('-t A Scanner Darkly' in the example) states the where clause the perform the update by
         
-        Example: update finish true -t A Scanner Darkly""", 
+        Example: update finished true -t A Scanner Darkly""", 
              "sum": """        Example: sum pages -T short stories""", 
              "count": """        Example: count title -F true""",
              "average": """        Example: average year -g science fiction""", 
@@ -73,6 +73,11 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
             -u or --user    takes two arguments following the flag: username password
             
         Example: change -h short stories -u test_user pw1234""", 
+             "plot": """        Plot prints a simple graph of an aggregated query
+        Each axis flag has a DB column specified, and one of those two states the aggregate type and the scale to plot by
+        A where clause can be declared using the '-w' flag followed by arguments in the standard 'search' format
+        
+        Example: plot -X author -Y count title 1 -w -g science fiction""",
              "upload": """        Upload takes no flag arguments, and file must be a csv with no column label row
         
         Expected column ordering by host table:
@@ -108,9 +113,10 @@ HELP_STANDARD = """
         count       performs COUNT SQL function
         average     performs AVG SQL function
         update      performs the UPDATE SQL function
+        plot        prints a simple graph of an aggregated query
         stats       outputs a statistics table on a 'search' command
         change      allows host table and user change
-        upload      allows for bulk insert from CSV file
+        upload      allows for bulk 'insert' from CSV file
         export      allows writing query output to a text file
         exit        safely exits program
         

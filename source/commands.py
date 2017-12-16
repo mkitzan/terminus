@@ -6,6 +6,44 @@ import dataprint
 from math import ceil
 
 
+def plot(inpt, info):
+    args = {"-w": [], "-X": [], "-Y": []}
+    agg = ["count", "sum", "avg"]
+    temp = []
+    scale = 1
+    op = "count"
+    flg = "-Y"
+
+    for el in reversed(inpt):
+        if el in args.keys():
+            args[el] += reversed(temp)
+            temp = []
+        else:
+            temp += [el]
+    
+    for el in (args["-X"] + ["-X"]) if len(args["-X"]) > 1 else (args["-Y"] + ["-Y"]):
+        try:
+            int(el)
+            scale = int(el)
+        except ValueError:
+            if el in agg:
+                op = el
+            elif el in args.keys():
+                flg = el
+    
+    args[flg].remove(op)
+    args[flg].remove(str(scale))
+    op_flg = "-X" if flg == "-Y" else "-Y"
+    
+    sql_query = "SELECT " + ((args["-Y"][0] + ", " + args["-X"][0]) if flg == "-X" else (args["-X"][0] + ", " + args["-Y"][0])) + \
+                " FROM " + info[1] + ((" WHERE " + query.parse_flags(args["-w"])) if "-w" in inpt else "") + " ORDER BY " + args[op_flg][0]
+
+    columns, results = query.execute_sql(info[0], sql_query)
+    
+    dataprint.plot(columns, results, op, scale, flg[1].lower(), buffer_val=(0 if flg[1] == "x" else 1))
+    input(statics.PAUSE)
+
+
 def cmd_stats(inpt, info):
     sql_query = query.parse_sql(inpt, info[1], "search")
 
@@ -40,6 +78,25 @@ def insert(inpt, info):
     info[0].commit()
 
 
+def prepare_row(row):
+    key = []
+    row = row.split(",")
+    st = None
+    
+    proc_row = []
+    for i in range(len(row)):
+        if st is None:
+            if row[i][0] == "\"" and row[i][-1] != "\"":
+                st = i
+            else:
+                proc_row += [row[i]]
+        elif row[i][-1] == "\"":
+            proc_row += [",".join(row[st:i+1])]
+            st = None
+            
+    return proc_row
+
+
 def upload(inpt, info):
     file_len = 0
     for line in open(inpt[0], "r"):
@@ -53,7 +110,7 @@ def upload(inpt, info):
             ratio = curr / file_len
             progress = ceil(ratio * statics.PROGRESS)
             ratio = ceil(ratio * 100)
-            row = row.strip("\n").replace(",", "', '")
+            row = "', '".join(prepare_row(row.strip("\n")))
 
             session.clear_screen()
             print(info[2] + "@" + info[1] + ": " + "upload " + inpt[0]) 
@@ -62,8 +119,8 @@ def upload(inpt, info):
             
             sql_query = "INSERT INTO " + info[1] + "(" + ", ".join(statics.HOST_SET[info[1]]) + ")" \
                                                    " VALUES('" + row + "')"
+            
             query.execute_sql(info[0], sql_query)
-    
             curr += 1
             row = file.readline()
     
@@ -170,7 +227,7 @@ def distinct(inpt, info):
     if op == "stats":
         dataprint.stats(columns, results)
     elif op == "export":
-        dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt))
+        dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt), plot_res=True)
         return
     elif op == "search":
         dataprint.table(columns, results)

@@ -7,9 +7,10 @@ FUNCTIONS = {"search": commands.search, "insert": commands.insert,
              "remove": commands.remove, "update": commands.update,
              "exit": commands.close_out, "sum": commands.sum,
              "count": commands.count, "average": commands.average,
-             "change": commands.change, "help": commands.cmd_help,
-             "upload": commands.upload, "stats": commands.cmd_stats,
-             "export": commands.export, "distinct": commands.distinct}
+             "plot": commands.plot, "change": commands.change, 
+             "help": commands.cmd_help, "upload": commands.upload, 
+             "stats": commands.cmd_stats, "export": commands.export, 
+             "distinct": commands.distinct}
 
 
 def execute_sql(db, sql_query):

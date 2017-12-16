@@ -9,7 +9,7 @@ In previous versions it would have been a nightmare to integrate new table into 
 
 # Features
 - 3 library host tables (books, stories, quotes), and 1 administrative host table (records)
-- 14 command functions including: file upload, the aggregate trinity, query result export...
+- 15 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export...
 - User/password system
 - Full wildcard support
 - Case insensitive searching
@@ -50,6 +50,11 @@ Enter the username/password you created in the initial set-up. Begin normal use.
 - average, performs the SQL AVG aggregation.
 
       user@host: average year -g science fiction
+- plot, prints a simple graph of an aggregated query.
+Each axis flag has a DB column specified, and one of those two states the aggregate type and the scale to plot by
+A where clause can be declared using the '-w' flag followed by arguments in the standard 'search' format
+
+	  user@host: plot -X author -Y count title 1 -w -F true
 - change, allows user to change host table, or change user entirely.
 
       user@host: change -h short stories -u test_user pw1234
