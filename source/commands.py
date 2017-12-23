@@ -6,7 +6,28 @@ import dataprint
 from math import ceil
 
 
+def sql(inpt, info):
+    """Runs a raw SQL query."""
+    # checks if query is accessing a blocked table
+    for el in inpt:
+        if el in statics.BLOCKED:
+            return
+    
+    command = inpt.pop(0)
+    sql_query = " ".join(inpt)
+    columns, results = query.execute_sql(info[0], sql_query)
+    
+    if command == "search":
+        dataprint.table(columns, results)
+    elif command == "stats":
+        dataprint.stats(columns, results)
+        
+    input(statics.PAUSE)
+
+
 def plot(inpt, info):
+    """Preprocessing for dataprint's plot.
+    Creates the augmented SQL query specifically for plot."""
     args = {"-w": [], "-X": [], "-Y": []}
     agg = ["count", "sum", "avg"]
     temp = []
@@ -14,6 +35,7 @@ def plot(inpt, info):
     op = "count"
     flg = "-Y"
 
+    # creates lists of each flags arguments
     for el in reversed(inpt):
         if el in args.keys():
             args[el] += reversed(temp)
@@ -21,6 +43,7 @@ def plot(inpt, info):
         else:
             temp += [el]
     
+    # finds the aggregate axis, sets variables for use in printing
     for el in (args["-X"] + ["-X"]) if len(args["-X"]) > 1 else (args["-Y"] + ["-Y"]):
         try:
             int(el)
@@ -40,11 +63,12 @@ def plot(inpt, info):
 
     columns, results = query.execute_sql(info[0], sql_query)
     
-    dataprint.plot(columns, results, op, scale, flg[1].lower(), buffer_val=(0 if flg[1] == "x" else 1))
+    dataprint.plot(columns, results, op, scale, flg[1].lower(), buffer_val=(0 if flg[1] == "X" else 1))
     input(statics.PAUSE)
 
 
 def cmd_stats(inpt, info):
+    """Intermediary function for dataprint's stats function."""
     sql_query = query.parse_sql(inpt, info[1], "search")
 
     columns, results = query.execute_sql(info[0], sql_query)
@@ -53,6 +77,7 @@ def cmd_stats(inpt, info):
 
 
 def repackage(inpt, host):
+    """Tosses out flags, and joins multi-word values together."""
     cols = [-1] * len(statics.HOST_SET[host])
     flag = 0
 
@@ -69,6 +94,7 @@ def repackage(inpt, host):
     
     
 def insert(inpt, info):
+    """Inserts a record into the current DB host table."""
     inpt = repackage(inpt, info[1])
 
     sql_query = "INSERT INTO " + info[1] + \
@@ -79,7 +105,7 @@ def insert(inpt, info):
 
 
 def prepare_row(row):
-    key = []
+    """Formats CSV so commas within quotes are not split upon."""
     row = row.split(",")
     st = None
     
@@ -98,6 +124,8 @@ def prepare_row(row):
 
 
 def upload(inpt, info):
+    """Uploads a CSV into the current DB host table."""
+    # loops through the file counting rows in the CSV
     file_len = 0
     for line in open(inpt[0], "r"):
         file_len += 1
@@ -107,11 +135,13 @@ def upload(inpt, info):
         curr = 1
         
         while row:
+            # processes progress ratios
             ratio = curr / file_len
             progress = ceil(ratio * statics.PROGRESS)
             ratio = ceil(ratio * 100)
             row = "', '".join(prepare_row(row.strip("\n")))
 
+            # prints the progress bar
             session.clear_screen()
             print(info[2] + "@" + info[1] + ": " + "upload " + inpt[0]) 
             print("\n    |" + ("#" * progress) + (" " * (statics.PROGRESS - progress)) + "|  " + str(ratio) + "%")
@@ -124,10 +154,11 @@ def upload(inpt, info):
             curr += 1
             row = file.readline()
     
-    info[0].commit()
+        info[0].commit()
 
 
 def remove(inpt, info):
+    """Intermediary function to remove some set of records from the current DB host table."""
     sql_query = query.parse_sql(inpt, info[1], "remove")
 
     query.execute_sql(info[0], sql_query)
@@ -135,10 +166,11 @@ def remove(inpt, info):
 
 
 def find_change(inpt):
+    """Creates the change clause for the update function."""
     change = inpt.pop(0).capitalize() + "='"
     
     for i in range(len(inpt)):
-        flg = statics.ret_flag(inpt, i)
+        flg = statics.ret_flag(inpt, i) if "-" == inpt[i][0] else ""
         if flg in statics.FLAGS:
             change = change[:-1]
             break
@@ -151,6 +183,7 @@ def find_change(inpt):
 
 
 def update(inpt, info):
+    """Runs an update on the current DB host table."""
     criteria = "UPDATE " + info[1] + " SET " + find_change(inpt) + " WHERE "
     where = query.parse_flags(inpt)
 
@@ -159,18 +192,22 @@ def update(inpt, info):
 
 
 def sum(inpt, info):
+    """aggregate helper function, passes SUM"""
     aggregate("SUM", inpt, info)
 
 
 def count(inpt, info):
+    """aggregate helper function, passes COUNT"""
     aggregate("COUNT", inpt, info)
 
 
 def average(inpt, info):
+    """aggregate helper function, passes AVG"""
     aggregate("AVG", inpt, info)  
 
 
 def aggregate(agg, inpt, info):
+    """Creates and runs a DB update."""
     sql_query = "SELECT " + agg + "(" + inpt[0] + ")" + " FROM " + info[1] + " WHERE " + query.parse_flags(inpt[1:])
 
     columns, results = query.execute_sql(info[0], sql_query)
@@ -179,6 +216,7 @@ def aggregate(agg, inpt, info):
     
     
 def export(inpt, info):
+    """Performs a search with the input, then passes the results to dataprint's export."""
     args = [el for el in inpt]
     sql_query = query.parse_sql(inpt, info[1], "search")
 
@@ -187,14 +225,17 @@ def export(inpt, info):
 
 
 def search(inpt, info):
+    """Runs a DB search then acts as an intermediary function for dataprint's table function."""
     sql_query = query.parse_sql(inpt, info[1], "search")
 
     columns, results = query.execute_sql(info[0], sql_query)
     dataprint.table(columns, results)
+    
     input(statics.PAUSE)
     
     
 def find_op(inpt):
+    """Cuts out args stating the operation to perform."""
     for i in range(len(inpt)):
         curr = inpt[i][1:3].upper() if len(inpt[i]) > 2 else inpt[i]
         
@@ -204,7 +245,9 @@ def find_op(inpt):
             return op
     
     
-def distinct(inpt, info): 
+def distinct(inpt, info):
+    """Executes a standard search query, then cuts out non-distinct records.
+    After, executes dataprint functions: stats, export, or search on the results set."""
     op = find_op(inpt)
         
     sql_query = query.parse_sql(inpt[1:], info[1], "search")
@@ -236,6 +279,7 @@ def distinct(inpt, info):
 
 
 def change(inpt, info):
+    """Allows user to change the user, or host table."""
     length = len(inpt)
 
     for i in range(length):
@@ -258,11 +302,13 @@ def change(inpt, info):
 
 
 def close_out(inpt, info):
+    """Closes DB connection."""
     info[0].close()
     print(statics.CLOSE)
 
 
 def cmd_help(inpt, info):
+    """Prints the correctly formatted help page."""
     print(statics.help1(info[1]))
 
     for i in statics.HOST_SET[info[1]]:

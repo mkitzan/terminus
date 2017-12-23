@@ -10,6 +10,7 @@ from time import strftime
 
 
 def create_record(inpt, info):
+    """Creates and submits a record of a user inputted command."""
     sql_query = "INSERT INTO records VALUES('" + strftime("%d/%m/%Y %H:%M:%S") + "', '" + info[2] + "', '" + \
                 inpt[0] + "', '" + info[1] + "', '" + " ".join(inpt[1:]) + "')"
     query.execute_sql(info[0], sql_query)
@@ -17,6 +18,7 @@ def create_record(inpt, info):
 
 
 def hash_credentials(text, key):
+    """Performs the hash on user/password input."""
     hasher = sha256()
     hasher.update(bytes(text+key, "utf-8"))
     
@@ -24,6 +26,7 @@ def hash_credentials(text, key):
 
 
 def verify(db, username, password):
+    """Executes test on user/password input, and returns the truth value."""
     hash_key = hash_credentials(username, password)
 
     curs = db.cursor()
@@ -36,6 +39,8 @@ def verify(db, username, password):
 
 
 def login(db):
+    """Loop which queries user for login credentials.
+    Returns host, user information, which is used through out the session."""
     valid = False
 
     while not valid:
@@ -62,6 +67,7 @@ def login(db):
 
 
 def change_host(db, host):
+    """Aids changing host by first checking if suggested host exists in DB."""
     if host in statics.BLOCKED:
         return False
 
@@ -75,6 +81,7 @@ def change_host(db, host):
 
 
 def system_vars():
+    """Sets variables often used throughout the active session."""
     if name == "nt":
         statics.CLEAR = "cls"
     elif name == "posix":
@@ -82,12 +89,15 @@ def system_vars():
 
 
 def clear_screen():
+    """Clears the screen."""
     system(statics.CLEAR)
 
 
 def title():
+    """Sets the terminal title."""
     system(statics.TERMINAL_TITLE)
 
 
 def get_connection():
+    """Creates a connection to the DB"""
     return connect(statics.DB)

@@ -1,13 +1,13 @@
 VERSION = "Terminus v1.9"
 
-#font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.0
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.1
 TITLE = """
-      _______                  _                         __  ___  
-     |__   __|                (_)                       /_ |/ _ \ 
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| | (_) |
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / |\__, |
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ / / 
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)_/ 
+      _______                  _                         ___    ___  
+     |__   __|                (_)                       |__ \  / _ \ 
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) || | | |
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // / | | | |
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ | |_| |
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)___/
      Terminal Library Database
     """
 
@@ -19,28 +19,34 @@ BOUNDS = 35
 HEIGHT = 35
 PROGRESS = 35
 
+# error and pause text
 PAUSE = "\nPress enter to continue..."
 HOST_ERROR = "\nInvalid host input"
 LOGIN_ERROR = "\nInvalid login credentials"
 CMD_ERROR = "        Invalid command"
 EXCEPT = "\nTry: help "
 
+# names of tables, not allowed to be accessed
 BLOCKED = ["sqlite_master", "credentials"]
 
 PARSE = {"remove": lambda h: "DELETE FROM " + h}
 
+# flag and column pairs for all columns throughout the DB
 FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-y": "Year", "-p": "Pages", "-f": "Format", "-F": "Finished", 
          "-c": "Collection", "-q": "Quote", "-d": "Date", "-o": "Operation",
          "-h": "Host", "-u": "User", "-A": "Arguments"}
         
+# all flags with capital short flags
 CAPS = {"--type": "-T", "--finished": "-F", "arguments": "-A"}
 
+# list of columns for each table (in order)
 HOST_SET = {"books": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Format", "Finished"],
             "stories": ["Title", "Author", "Genre", "Year", "Pages", "Collection", "Finished"],
             "quotes": ["Title", "Author", "Year", "Quote"],
             "records": ["Date", "User", "Operation", "Host", "Arguments"]}
 
+# help text for each flag/column
 FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
              "Author": "        -a or --author      flag specifies the author",
              "Genre": "        -g or --genre       flag specifies the genre",
@@ -57,6 +63,7 @@ FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
              "Host": "        -h or --host        flag specifies the host",
              "Arguments": "        -A or --arguments   flag specifies the command arguments"}
 
+# help text for each command function
 HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short stories""", 
              "insert": """        Flag order is not important for insert; however, all flags must be present
         Example: insert -t Labryinths -a Jorge Luis Borges -g science fiction -y 1962 -p 251 -T stories -f paperback -F false""", 
@@ -101,8 +108,13 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
         Unique flag '-C' or '--command' states how to run the arguments. Valid commands: 'search', 'stats', and 'export'
         
         Example: distinct title -F true -s author -C search""",
+             "sql": """        The SQL command allows user to enter a raw SQL query. Useful for JOIN queries.
+        The user must declare, immediately after the 'sql' keyword, either 'search' or 'stats'.
+             
+        Example: sql search SELECT Author, Year FROM books WHERE Year LIKE 19%%""",
              "exit": """        Exit takes no arguments used to safely leave the program"""}
 
+# default help text
 HELP_STANDARD = """
     Command list:
         search      performs SELECT SQL function
@@ -118,11 +130,19 @@ HELP_STANDARD = """
         change      allows host table and user change
         upload      allows for bulk 'insert' from CSV file
         export      allows writing query output to a text file
+        sql         allows user to enter a raw SQL query
         exit        safely exits program
         
     Terminus supports both GNU and SQL wildcards:
         '*' or '%'  select any amount of characters
-        '?' or '_'  select a single character"""
+        '?' or '_'  select a single character
+        
+    Terminus flag queries supports 'not' argument:
+        Flags normally match the their following argument.
+        Example: 'search -y 19??', matches all records with a year field in the 1900's
+        
+        By placing 'not' in front of the argument, Terminus matches only if the argument is not true.
+        Example: 'search -y not 19??', matches all records where (year < 1900 OR year > 1999)"""
 
 SETUP_OPTIONS = """ Set-up Options
         
@@ -143,6 +163,7 @@ You can download the latest version at 'https://www.sqlite.org/download.html'
           """
 HAS_SQLITE3 = "Do you have SQLite3 installed on this machine? [Y/n]: "
 
+# input prompt text
 GET_USER = "Username: "
 GET_PW = "Password: "
 GET_HOST = "    Host: "
@@ -157,7 +178,7 @@ CLOSE = "\nDatabase connection closed"
 CLEAR = "clear"
 TERMINAL_TITLE = "title " + VERSION
 
-
+# print functions which take some variable input
 def ret_flag(inpt, i):
     return (inpt[i][1:3] if inpt[i] not in CAPS.keys() else CAPS[inpt[i]]) if len(inpt[i]) > 2 else inpt[i]
 

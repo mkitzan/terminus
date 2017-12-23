@@ -5,6 +5,8 @@ import statics
 
 
 def format_quote(quote):
+    """Formats quotes which trail multiple lines by line breaking between words.
+    Otherwise, lines will often be split mid word."""
     barrier = statics.WIDTH - statics.BOUNDS
     length = len(quote)
 
@@ -20,6 +22,7 @@ def format_quote(quote):
 
 
 def random_quote(db):
+    """Randomly selects/prints one quote from the quotes table."""
     quote = db.cursor()
     quote.execute("SELECT * FROM quotes ORDER BY RANDOM() LIMIT 1")
     row = quote.fetchone()
@@ -31,6 +34,7 @@ def random_quote(db):
 
 
 def home_screen(db):
+    """Prints the start screen, and random quote."""
     print(statics.TITLE)
 
     random_quote(db)
@@ -39,14 +43,15 @@ def home_screen(db):
 
 
 def main():
+    """Landing point, sets info variables used through the program.
+    Transfers control to the function which takes command input"""
     session.title()
     session.clear_screen()
     
     info = [None, None, None]
     info[0] = session.get_connection()
-
     home_screen(info[0])
-
+    # sets info variables used throughout active session
     info[1], info[2] = session.login(info[0])
     
     query.landing(info)

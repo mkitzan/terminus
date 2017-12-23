@@ -27,6 +27,7 @@ PLOT_OPS = {"count": lambda arr: len(set(arr)),
             
             
 def set_variables(window=WINDOW, path=PATH, nvalid=NVALID, missing=MISSING, rounding=ROUND):
+    """Sets common user declared variables. Defaults to the the standard values."""
     WINDOW = window
     PATH = path
     NVALID = nvalid
@@ -35,6 +36,7 @@ def set_variables(window=WINDOW, path=PATH, nvalid=NVALID, missing=MISSING, roun
            
 
 def set_max_y(res, flg, max_y):
+    """Tests/sets max length of y-axis values."""
     test = res[-1][1 if flg == "y" else 0]
     
     if (len(str(test)) if type(test) is str else test) > max_y:
@@ -44,6 +46,7 @@ def set_max_y(res, flg, max_y):
 
 
 def set_max_x(res, flg, max_x):
+    """Tests/sets max length of x-axis values."""
     test = res[-1][1 if flg == "x" else 0]
 
     if (len(str(test)) if type(test) is str else test) > max_x:
@@ -53,35 +56,47 @@ def set_max_x(res, flg, max_x):
     
     
 def plot_aggregate_x(columns, res, max_y, max_x, buffer_val, point, scale, op, funct):
+    """Prints the graph for queries aggregated over the x-axis."""
+    # graph legend
     funct(" " * (max_y+1) + "X-axis: " + op + "(" + columns[1] + ")" + "   Scale: " + str(scale) + "   Y-axis: " + columns[0])
     
+    # graph body
     for el in res:
         funct((((" " * max_y) + "|\n") * buffer_val) + (" " * (max_y - len(el[0]))) + el[0] + "|" + (point * el[1]))
     
+    # x-axis
     funct(" " * (max_y+1) + "-" * max_x)
     
+    # x-axis labels
     for i in range(len(str(max_x+1))):
         funct((" " * (max_y+1)) + "".join([((str(el)[i] + (" " * buffer_val)) if len(str(el)) > i else (" " * (buffer_val+1))) for el in range(1, max_x+1)]))
         
         
 def plot_aggregate_y(columns, res, max_y, max_x, buffer_val, point, scale, op, funct):
+    """Prints the graph for queries aggregated over the y-axis."""
+    # graph legend
     funct(" " * (len(str(max_y+1))+1) + "X-axis: " + columns[0] + "   Y-axis: " + op + "(" + columns[1] + ")" + "   Scale: " + str(scale))
 
+    # creates a list of (value, 'buffer offset') pairs
     res = [[el[0],(max_y - el[1])] for el in res]
 
+    # graph body
     for i in range(1, max_y+1):
         st = " " * (len(str(max_y+1)) - len(str(max_y+1 - i))) + str((max_y+1) - i) + "|"
         for el in res:
             st += (" " if i <= el[1] else point) + (" " * buffer_val)
         funct(st)
     
+    # x-axis
     funct(((len(str(max_y))+1) * " ") + ("-" * (len(st) - len(str(max_x)) - (1 + buffer_val))))
     
+    # x-axis labels
     for i in range(max_x):
         funct(((len(str(max_y))+1) * " ") + "".join([(str(el[0][i]) + (" " * buffer_val)) if len(el[0]) > i else (" " * (buffer_val+1)) for el in res]))
 
     
 def plot(columns, results, op, scale, flg, point="*", buffer_val=0, funct=print):
+    """Process results set and args for printing a graph."""
     res = []
     temp = []
     max_x = -1
@@ -94,6 +109,7 @@ def plot(columns, results, op, scale, flg, point="*", buffer_val=0, funct=print)
     except ValueError:
         curr = results[0][0]
     
+    # performs sum, count, or avg function for each distinct record value as a key
     for el in results:
         if el[0] != curr:
             res += [[str(curr) if num else "".join([word[0] for word in curr.split(" ")]), round(PLOT_OPS[op](temp) / scale)]]    
@@ -116,14 +132,17 @@ def plot(columns, results, op, scale, flg, point="*", buffer_val=0, funct=print)
             
 
 def border(max_lens, point):
+    """Creates the horizontal border for the results table."""
     return "".join([point + "-"*i for i in max_lens]) + point
 
 
 def make_row(values, val_bufs):
+    """Creates a row for the results table."""
     return "|" + "|".join([str(values[i]) + " " * val_bufs[i] for i in range(len(values))]) + "|"
 
 
 def buffers(columns, values, buffer_val):
+    """Processes the space multiple for buffers between records value and column borders."""
     max_lens = [len(str(i)) for i in columns]
     val_lens = [[i for i in max_lens]]
     roll_over = []
@@ -143,6 +162,7 @@ def buffers(columns, values, buffer_val):
 
 
 def print_data(tb_border, columns, values, val_bufs, funct):
+    """Creates the actual table from the processed data."""
     funct(tb_border + "\n" + make_row(columns, val_bufs[0]) + "\n" + tb_border)
 
     for i in range(len(values)):
@@ -152,6 +172,7 @@ def print_data(tb_border, columns, values, val_bufs, funct):
 
 
 def table(columns, values, point="*", buffer_val=1, funct=print):
+    """Calls functions to prepare for printing."""
     val_bufs, max_lens = buffers(columns, values, buffer_val)
 
     tb_border = border(max_lens, point)
@@ -160,10 +181,13 @@ def table(columns, values, point="*", buffer_val=1, funct=print):
     
 
 def process(values, columns):
+    """Processes statistic values for each column in the results set."""
+    # creates a list to store stats results
     stats = [[-1] for el in SFUNCTS.keys()]
     for key in SFUNCTS.keys():
         stats[SFUNCTS[key][0]] = [key]
     
+    # transposes results set
     values = [list(el) for el in zip(*values)]
     
     for column in values:
@@ -172,9 +196,11 @@ def process(values, columns):
         for key in SFUNCTS.keys():
             try:
                 stats[SFUNCTS[key][0]] += [SFUNCTS[key][1](column)]
+            # case where the value is not a number
             except Exception:
                 stats[SFUNCTS[key][0]] += [NVALID]
-
+    
+    # catches case where results set is empty
     if len(stats[0]) == 1:
         for i in range(len(stats)):
             stats[i] += [NVALID] * len(columns)
@@ -185,6 +211,7 @@ def process(values, columns):
 
 
 def stats(columns, values, point="*", buffer_val=1, remainder=4, nvalid="-", funct=print):
+    """Calls functions to process statistics, and print the table."""
     ROUND = remainder
     NVALID = nvalid
     
@@ -193,7 +220,17 @@ def stats(columns, values, point="*", buffer_val=1, remainder=4, nvalid="-", fun
     table(columns, values, point, buffer_val, funct)
     
     
+def exp_plot(x, y, columns, values, op, scale, axis, buffer_val, fnct):
+    temp = [values[columns.index(x)], values[columns.index(y)]]
+    temp = sorted([list(el) for el in zip(*temp)], key=lambda x: x[0])
+    plot([x, y], temp, op, scale, axis, buffer_val=1, funct=fnct)
+    
+    fnct("")
+
+
 def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", plot_res=False):
+    """Creates and writes data to export file. 
+    Export file includes: result set table, statistics table, and four different graphs."""
     ROUND = remainder
     NVALID = nvalid
     
@@ -206,30 +243,16 @@ def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, r
     stats(columns, values, point, buffer_val, remainder, nvalid, lambda x: expfile.write(x + "\n"))
     
     if plot_res:
-        #Transpose graph correctly, change 'y' -> 'x', and buffer_val=0
+        # transpose graph correctly, change 'y' -> 'x', and buffer_val=0
         expfile.write("\nResults Graphs: Author\n")
         values = [list(el) for el in zip(*values)]
+
+        exp_plot("Author", "Title", columns, values, "count", 1, "y", 1, lambda x: expfile.write(x + "\n"))
+        exp_plot("Author", "Pages", columns, values, "sum", 100, "y", 1, lambda x: expfile.write(x + "\n"))
         
-        temp = [values[columns.index("Author")], values[columns.index("Title")]]
-        temp = sorted([list(el) for el in zip(*temp)], key=lambda x: x[0])
-        plot(["Author", "Title"], temp, "count", 1, "y", buffer_val=1, funct=lambda x: expfile.write(x + "\n"))
+        expfile.write("Results Graphs: Year\n")
         
-        expfile.write("\n")
+        exp_plot("Year", "Title", columns, values, "count", 1, "y", 1, lambda x: expfile.write(x + "\n"))
+        exp_plot("Year", "Pages", columns, values, "sum", 100, "y", 1, lambda x: expfile.write(x + "\n"))
         
-        temp = [values[columns.index("Author")], values[columns.index("Pages")]]
-        temp = sorted([list(el) for el in zip(*temp)], key=lambda x: x[0])
-        plot(["Author", "Pages"], temp, "sum", 100, "y", buffer_val=1, funct=lambda x: expfile.write(x + "\n"))
-        
-        expfile.write("\nResults Graphs: Year\n")
-        
-        temp = [values[columns.index("Year")], values[columns.index("Title")]]
-        temp = sorted([list(el) for el in zip(*temp)], key=lambda x: x[0])
-        plot(["Title", "Year"], temp, "count", 1, "y", buffer_val=1, funct=lambda x: expfile.write(x + "\n"))
-        
-        expfile.write("\n")
-        
-        temp = [values[columns.index("Year")], values[columns.index("Pages")]]
-        temp = sorted([list(el) for el in zip(*temp)], key=lambda x: x[0])
-        plot(["Year", "Pages"], temp, "sum", 100, "y", buffer_val=1, funct=lambda x: expfile.write(x + "\n"))
-    
     expfile.close()

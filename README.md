@@ -9,7 +9,7 @@ In previous versions it would have been a nightmare to integrate new table into 
 
 # Features
 - 3 library host tables (books, stories, quotes), and 1 administrative host table (records)
-- 15 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export...
+- 16 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export...
 - User/password system
 - Full wildcard support
 - Case insensitive searching
@@ -68,6 +68,10 @@ A where clause can be declared using the '-w' flag followed by arguments in the 
 All arguments are processed as a 'search' command.
         
 	  user@host: export -T stories -g science fiction -s author
+- sql, allows user to execute a raw SQL statement. The statement can't query sqlite_master nor credentials.
+Must declare either search or stats as the first argument.
+
+	  user@host: sql search SELECT title, author, year FROM books UNION SELECT title, author, year FROM stories
 - help, displays general and host specific use information. 'help command_here' includes use information for that command.
 
       user@host: help upload
