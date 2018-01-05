@@ -6,6 +6,22 @@ import dataprint
 from math import ceil
 
 
+def tsv(inpt, info):
+    """Exports a search query to TSV."""
+    sql_query = query.parse_sql(inpt, info[1], "search")
+    
+    columns, results = query.execute_sql(info[0], sql_query)
+    fileout(columns, results, "\t")
+
+
+def fileout(columns, results, delim):
+    """Helper function to write a result set to a TSV file."""
+    with open("library-export.tsv" if delim == "\t" else "library-export.csv", "w") as outfile:
+        outfile.write(delim.join(columns) + "\n")
+        for row in results:
+            outfile.write(delim.join([str(i) for i in row]) + "\n")
+
+
 def sql(inpt, info):
     """Runs a raw SQL query."""
     # checks if query is accessing a blocked table
@@ -28,17 +44,21 @@ def sql(inpt, info):
 def plot(inpt, info):
     """Preprocessing for dataprint's plot.
     Creates the augmented SQL query specifically for plot."""
-    args = {"-w": [], "-X": [], "-Y": []}
+    args = {"whr": [], "-X": [], "-Y": []}
     agg = ["count", "sum", "avg"]
     temp = []
-    scale = 1
-    op = "count"
-    flg = "-Y"
+    spec_vars = [False, 1, "count", "-Y"] # WHERE exists, scale, operation type, aggregated axis
 
     # creates lists of each flags arguments
     for el in reversed(inpt):
-        if el in args.keys():
-            args[el] += reversed(temp)
+        if "-" in el:
+            if el in args.keys():
+                args[el] += reversed(temp)
+            else:
+                spec_vars[0] = True
+                args["whr"] += [el]
+                args["whr"] += reversed(temp)
+            
             temp = []
         else:
             temp += [el]
@@ -47,23 +67,23 @@ def plot(inpt, info):
     for el in (args["-X"] + ["-X"]) if len(args["-X"]) > 1 else (args["-Y"] + ["-Y"]):
         try:
             int(el)
-            scale = int(el)
+            spec_vars[1] = int(el)
         except ValueError:
             if el in agg:
-                op = el
+                spec_vars[2] = el
             elif el in args.keys():
-                flg = el
+                spec_vars[3] = el
     
-    args[flg].remove(op)
-    args[flg].remove(str(scale))
-    op_flg = "-X" if flg == "-Y" else "-Y"
+    args[spec_vars[3]].remove(spec_vars[2])
+    args[spec_vars[3]].remove(str(spec_vars[1]))
+    op_flg = "-X" if spec_vars[3] == "-Y" else "-Y"
     
-    sql_query = "SELECT " + ((args["-Y"][0] + ", " + args["-X"][0]) if flg == "-X" else (args["-X"][0] + ", " + args["-Y"][0])) + \
-                " FROM " + info[1] + ((" WHERE " + query.parse_flags(args["-w"])) if "-w" in inpt else "") + " ORDER BY " + args[op_flg][0]
+    sql_query = "SELECT " + ((args["-Y"][0] + ", " + args["-X"][0]) if spec_vars[3] == "-X" else (args["-X"][0] + ", " + args["-Y"][0])) + \
+                " FROM " + info[1] + ((" WHERE " + query.parse_flags(args["whr"])) if spec_vars[0] else "") + " ORDER BY " + args[op_flg][0]
 
     columns, results = query.execute_sql(info[0], sql_query)
     
-    dataprint.plot(columns, results, op, scale, flg[1].lower(), buffer_val=(0 if flg[1] == "X" else 1))
+    dataprint.plot(columns, results, spec_vars[2], spec_vars[1], spec_vars[3][1].lower(), buffer_val=(0 if spec_vars[3][1] == "X" else 1))
     input(statics.PAUSE)
 
 
@@ -271,6 +291,9 @@ def distinct(inpt, info):
         dataprint.stats(columns, results)
     elif op == "export":
         dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt), plot_res=True)
+        return
+    elif op == "tsv":
+        fileout(columns, results, "\t")
         return
     elif op == "search":
         dataprint.table(columns, results)

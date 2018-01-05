@@ -11,7 +11,8 @@ FUNCTIONS = {"search": commands.search, "insert": commands.insert,
              "plot": commands.plot, "change": commands.change, 
              "help": commands.cmd_help, "upload": commands.upload, 
              "stats": commands.cmd_stats, "export": commands.export, 
-             "distinct": commands.distinct, "sql": commands.sql}
+             "distinct": commands.distinct, "sql": commands.sql,
+             "tsv": commands.tsv}
 
 
 def execute_sql(db, sql_query):

@@ -28,7 +28,7 @@ def random_quote(db):
     row = quote.fetchone()
     
     if row is not None:
-        print(" \"" + format_quote(row[3]) + "\"\n\t-" + row[1] + "\n\t " + row[0] + ", " + str(row[2]))
+        print("\n \"" + format_quote(row[3]) + "\"\n\n\t-" + row[1] + "\n\t " + row[0] + ", " + str(row[2]))
     
     quote.close()
 

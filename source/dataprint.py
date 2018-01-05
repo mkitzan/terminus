@@ -25,15 +25,6 @@ PLOT_OPS = {"count": lambda arr: len(set(arr)),
             "sum": lambda arr: sum(arr),
             "avg": lambda arr: sum(arr) / len(arr)}
             
-            
-def set_variables(window=WINDOW, path=PATH, nvalid=NVALID, missing=MISSING, rounding=ROUND):
-    """Sets common user declared variables. Defaults to the the standard values."""
-    WINDOW = window
-    PATH = path
-    NVALID = nvalid
-    MISSING = missing
-    ROUND = rounding
-           
 
 def set_max_y(res, flg, max_y):
     """Tests/sets max length of y-axis values."""
@@ -82,7 +73,7 @@ def plot_aggregate_y(columns, res, max_y, max_x, buffer_val, point, scale, op, f
 
     # graph body
     for i in range(1, max_y+1):
-        st = " " * (len(str(max_y+1)) - len(str(max_y+1 - i))) + str((max_y+1) - i) + "|"
+        st = " " * (len(str(max_y)) - len(str(max_y+1 - i))) + str((max_y+1) - i) + "|"
         for el in res:
             st += (" " if i <= el[1] else point) + (" " * buffer_val)
         funct(st)
@@ -221,6 +212,7 @@ def stats(columns, values, point="*", buffer_val=1, remainder=4, nvalid="-", fun
     
     
 def exp_plot(x, y, columns, values, op, scale, axis, buffer_val, fnct):
+    """Plot helper function for 'export'. Formats results for plotting."""
     temp = [values[columns.index(x)], values[columns.index(y)]]
     temp = sorted([list(el) for el in zip(*temp)], key=lambda x: x[0])
     plot([x, y], temp, op, scale, axis, buffer_val=1, funct=fnct)

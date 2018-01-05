@@ -9,7 +9,7 @@ In previous versions it would have been a nightmare to integrate new table into 
 
 # Features
 - 3 library host tables (books, stories, quotes), and 1 administrative host table (records)
-- 16 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export...
+- 17 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export...
 - User/password system
 - Full wildcard support
 - Case insensitive searching
@@ -51,10 +51,9 @@ Enter the username/password you created in the initial set-up. Begin normal use.
 
       user@host: average year -g science fiction
 - plot, prints a simple graph of an aggregated query.
-Each axis flag has a DB column specified, and one of those two states the aggregate type and the scale to plot by
-A where clause can be declared using the '-w' flag followed by arguments in the standard 'search' format
+Each axis flag has a DB column specified, and one of those two states the aggregate type and the scale to plot by.
 
-	  user@host: plot -X author -Y count title 1 -w -F true
+	  user@host: plot -X author -Y count title 1 -F true
 - change, allows user to change host table, or change user entirely.
 
       user@host: change -h short stories -u test_user pw1234
@@ -72,6 +71,9 @@ All arguments are processed as a 'search' command.
 Must declare either search or stats as the first argument.
 
 	  user@host: sql search SELECT title, author, year FROM books UNION SELECT title, author, year FROM stories
+- tsv, allows user to export a query as a tsv file for use in other programs or applications.
+
+	  user@host: tsv -F false -T not manga -T not art book
 - help, displays general and host specific use information. 'help command_here' includes use information for that command.
 
       user@host: help upload

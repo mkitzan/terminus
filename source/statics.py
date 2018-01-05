@@ -1,13 +1,13 @@
-VERSION = "Terminus v1.9"
+VERSION = "Terminus v2.1"
 
-# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.1
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.2
 TITLE = """
-      _______                  _                         ___    ___  
-     |__   __|                (_)                       |__ \  / _ \ 
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) || | | |
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // / | | | |
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ | |_| |
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)___/
+      _______                  _                         ___   __ 
+     |__   __|                (_)                       |__ \ /_ |
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) | | |
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /  | |
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _| |
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)_|
      Terminal Library Database
     """
 
@@ -81,10 +81,10 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
             
         Example: change -h short stories -u test_user pw1234""", 
              "plot": """        Plot prints a simple graph of an aggregated query
-        Each axis flag has a DB column specified, and one of those two states the aggregate type and the scale to plot by
-        A where clause can be declared using the '-w' flag followed by arguments in the standard 'search' format
+        Each axis flag needs a DB column specified, and one of those two states the aggregate type and the scale to plot by
+        All non-axis arguments are interpreted in the standard 'search' format
         
-        Example: plot -X author -Y count title 1 -w -g science fiction""",
+        Example: plot -X author -Y count title 1 -g science fiction -F true""",
              "upload": """        Upload takes no flag arguments, and file must be a csv with no column label row
         
         Expected column ordering by host table:
@@ -105,14 +105,17 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
         Example: export -T stories -g science fiction -s author""",
              "distinct": """        Distinct allows for searching records with the distinct values in the specified column
         Specific column is stated directly next to the 'distinct' command word
-        Unique flag '-C' or '--command' states how to run the arguments. Valid commands: 'search', 'stats', and 'export'
+        Unique flag '-C' or '--command' states how to run the arguments. Commands: 'search', 'stats', 'tsv', and 'export'
         
         Example: distinct title -F true -s author -C search""",
              "sql": """        The SQL command allows user to enter a raw SQL query. Useful for JOIN queries.
         The user must declare, immediately after the 'sql' keyword, either 'search' or 'stats'.
              
         Example: sql search SELECT Author, Year FROM books WHERE Year LIKE 19%%""",
-             "exit": """        Exit takes no arguments used to safely leave the program"""}
+             "tsv": """        Exports a TSV file of a search query. Useful when using library data for other programs.
+             
+        Example: tsv -F false""",
+             "exit": """        Exit takes no arguments. Used to safely leave the program"""}
 
 # default help text
 HELP_STANDARD = """
@@ -131,6 +134,7 @@ HELP_STANDARD = """
         upload      allows for bulk 'insert' from CSV file
         export      allows writing query output to a text file
         sql         allows user to enter a raw SQL query
+        tsv         allows user to export data for use in other applications
         exit        safely exits program
         
     Terminus supports both GNU and SQL wildcards:
