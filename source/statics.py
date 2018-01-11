@@ -1,13 +1,13 @@
-VERSION = "Terminus v2.1"
+VERSION = "Terminus v2.2"
 
-# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.2
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.3
 TITLE = """
-      _______                  _                         ___   __ 
-     |__   __|                (_)                       |__ \ /_ |
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) | | |
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /  | |
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _| |
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)_|
+      _______                  _                         ___    ___  
+     |__   __|                (_)                       |__ \  |__ \ 
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) |    ) |
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /    / / 
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ / /_ 
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)____|
      Terminal Library Database
     """
 
@@ -25,6 +25,9 @@ HOST_ERROR = "\nInvalid host input"
 LOGIN_ERROR = "\nInvalid login credentials"
 CMD_ERROR = "        Invalid command"
 EXCEPT = "\nTry: help "
+
+# logic ops available in queries
+LOGIC_OPS = {"v": [-1, "' OR "], "^": [-1, "' AND "], "!": [-3, " NOT "]}
 
 # names of tables, not allowed to be accessed
 BLOCKED = ["sqlite_master", "credentials"]
@@ -141,12 +144,21 @@ HELP_STANDARD = """
         '*' or '%'  select any amount of characters
         '?' or '_'  select a single character
         
-    Terminus flag queries supports 'not' argument:
-        Flags normally match the their following argument.
-        Example: 'search -y 19??', matches all records with a year field in the 1900's
+    Terminus supports logical arguments:
+        NOT:    By placing '!' in front of the argument, Terminus matches only if the argument is NOT true.
         
-        By placing 'not' in front of the argument, Terminus matches only if the argument is not true.
-        Example: 'search -y not 19??', matches all records where (year < 1900 OR year > 1999)"""
+            Example: search -y ! 19??, 
+            Matches all books in the DB published in the 1900's
+
+        OR:     By placing 'v' between two values following a flag, you can create queries which a value OR another.
+        
+            Example: plot -X year -Y avg pages 100 -y 196? v 197?,
+            Plots a graph of the average page count for books in the DB published between 1960 and 1979
+            
+        AND:    By placing '^' between two values following a flag, you can create queries which a value AND another.
+        
+            Example: stats -y ! 196? ^ 19?? -g science fiction
+            Matches all sci-fi books published in the 1900's but not in 1960's"""
 
 SETUP_OPTIONS = """ Set-up Options
         

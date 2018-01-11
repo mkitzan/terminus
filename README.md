@@ -60,7 +60,7 @@ Each axis flag has a DB column specified, and one of those two states the aggreg
 - upload, performs a file upload from CSV to the current host table.
 
       user@host: upload /directory/path/test_upload.csv
-- stats, outputs a statistics table for a search query. All agruments are processed as a 'search' command.
+- stats, outputs a statistics table for a search query. All arguments are processed as a 'search' command.
 
       user@host: stats -F true
 - export, writes the output of both a 'search' and 'stats' call to a file (named 'd/m/y DB Export.txt'). 
@@ -88,7 +88,7 @@ Must declare either search or stats as the first argument.
 
 'quotes' host table has 4 columns: title (-t), author (-a), year (-y), quote (-q)
 
-'reocrds' host table has 5 columns: date (-d), user (-u), operation (-o), host (-h), arguments (-A)
+'records' host table has 5 columns: date (-d), user (-u), operation (-o), host (-h), arguments (-A)
 
 Type column/flag denotes whether the books is a novel, short stories...
 
@@ -96,7 +96,7 @@ Format column/flag denotes whether the book is paperback or hardcover
 
 Finished column/flag denotes whether you have finished the book
 
-Collection column/flag denotes the short story colleciton the story comes from
+Collection column/flag denotes the short story collection the story comes from
 
 # Integrating a New Table
 - Open library.db in sqlite3, add the new table

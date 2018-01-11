@@ -16,7 +16,7 @@ SFUNCTS = {"Total": [0, lambda x: len(x)],
            "Minimum": [4, lambda x: NVALID if type(x[0]) is str else x[0]],
            "Maximum": [5, lambda x: NVALID if type(x[-1]) is str else x[-1]],
            "Mean": [6, lambda x: round(statistics.mean(x), ROUND)],
-           "Median": [7, lambda x: statistics.median(x)], 
+           "Median": [7, lambda x: int(statistics.median(x)) if type(x[0]) is int else statistics.median(x)], 
            "Mode": [8, lambda x: statistics.mode(x)],
            "Standard Deviation": [9, lambda x: round(statistics.stdev(x), ROUND)], 
            "Variance": [10, lambda x: round(statistics.variance(x), ROUND)]}

@@ -65,22 +65,25 @@ def parse_flags(args):
         # arg[1:3] if len(arg) > 2 else arg
 
         if curr in statics.FLAGS.keys():
-            where = where[:-1] + "' AND " + statics.FLAGS[curr] + " LIKE '"
+            where = where[:-1] + "') AND (" + statics.FLAGS[curr] + " LIKE '"
+        # processes logical operations in flag args
+        elif arg in statics.LOGIC_OPS.keys():
+            arg = statics.LOGIC_OPS[arg]
+            where = where.split(" ")
+            flag = "Title"
+            
+            for el in reversed(where[:-1]):
+                el = el.strip("(")
+
+                if el in statics.FLAG_HELP.keys():
+                    flag = el
+                    break
+                    
+            where = " ".join(where[:arg[0]]) + ((" (" + arg[1][1:]) if ("(" in where[arg[0]]) else arg[1]) + flag + " LIKE '" 
         else:
-            # backtracks and replaces the last occurrence of 'AND' with 'AND NOT'
-            if arg.upper() == "NOT":
-                where = where.split(" ")
-                
-                for i in range(len(where)):
-                    if where[(-1-i)] == "AND":
-                        where[(-1-i)] = "AND NOT"
-                        break
-
-                where = " ".join(where)
-            else:
-                where += arg + " "
-
-    return where[6:-1] + "'" + sort
+            where += arg + " "
+    
+    return where[7:-1] + "')" + sort
 
 
 def parse_sql(args, host, operation):
