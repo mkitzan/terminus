@@ -1,19 +1,21 @@
-VERSION = "Terminus v2.2"
+VERSION = "Terminus v2.3"
 
-# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.3
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.4
 TITLE = """
-      _______                  _                         ___    ___  
-     |__   __|                (_)                       |__ \  |__ \ 
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) |    ) |
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /    / / 
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ / /_ 
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)____|
+      _______                  _                         ___    ____  
+     |__   __|                (_)                       |__ \  |___ \ 
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) |   __) |
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /   |__ < 
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ ___) |
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)____/
      Terminal Library Database
     """
 
+# name of database to connect to
 DB = "library.db"
 DEFAULT_HOST = "books"
 
+# numbers used in formatting the progress bar, and quote on the landing page
 WIDTH = 125
 BOUNDS = 35
 HEIGHT = 35
@@ -29,7 +31,7 @@ EXCEPT = "\nTry: help "
 # logic ops available in queries
 LOGIC_OPS = {"v": [-1, "' OR "], "^": [-1, "' AND "], "!": [-3, " NOT "]}
 
-# names of tables, not allowed to be accessed
+# names of tables not allowed to be accessed
 BLOCKED = ["sqlite_master", "credentials"]
 
 PARSE = {"remove": lambda h: "DELETE FROM " + h}
@@ -67,18 +69,31 @@ FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
              "Arguments": "        -A or --arguments   flag specifies the command arguments"}
 
 # help text for each command function
-HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short stories""", 
-             "insert": """        Flag order is not important for insert; however, all flags must be present
+HELP_TEXT = {"search": """        The go to command for querying the host table's records. 
+        All the arguments following the command word specify the WHERE clause to query by.
+
+        Example: search -a Harlan Ellison -T short stories""", 
+             "insert": """        Inserts a records into the current host table. Flag order is not important for insert; however, all flags must be present.
+             
         Example: insert -t Labryinths -a Jorge Luis Borges -g science fiction -y 1962 -p 251 -T stories -f paperback -F false""", 
-             "remove": """        Example: remove -t Man Plus""",
-             "update": """        Update the first argument states the column where the update will take place, the next set states the change to be made
-        Finally, the last set ('-t A Scanner Darkly' in the example) states the where clause the perform the update by
+             "remove": """        Used to delete records from the host table. The following arguments specify the WHERE clause to remove records by.
+             
+        Example: remove -t Man Plus""",
+             "update": """        Update the first argument states the column where the update will take place, the next set states the change to be made.
+        The following arguments state the WHERE clause to update records by.
         
         Example: update finished true -t A Scanner Darkly""", 
-             "sum": """        Example: sum pages -T short stories""", 
-             "count": """        Example: count title -F true""",
-             "average": """        Example: average year -g science fiction""", 
-             "change": """        Change has two additional flags:
+             "sum": """        Sums the values in the specified column. The following arguments specify the query's WHERE clause.
+             
+        Example: sum pages -T short stories""", 
+             "count": """        Counts the values in the specified column. The following arguments specify the query's WHERE clause.
+             
+        Example: count title -F true""",
+             "avg": """        Finds the average of values in the specified column. The following arguments specify the query's WHERE clause.
+             
+        Example: avg year -g science fiction""", 
+             "change": """        Allows user to change the current host table, or user.
+        Change has two additional flags:
             -h or --host    specifies name of new host table
             -u or --user    takes two arguments following the flag: username password
             
@@ -88,7 +103,8 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
         All non-axis arguments are interpreted in the standard 'search' format
         
         Example: plot -X author -Y count title 1 -g science fiction -F true""",
-             "upload": """        Upload takes no flag arguments, and file must be a csv with no column label row
+             "upload": """        Upload takes no flag arguments, the file format must be a CSV or TSV with no column label row.
+        If an record in the upload file has a column value with a comma, insert that item individually.
         
         Expected column ordering by host table:
             books:      -t, -a, -g, -y, -p, -T, -f, -F
@@ -96,19 +112,17 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
             quotes:     -t, -a, -y, -q
             records:    -d, -u, -o, -h, -A
             
-        Example: upload /directory/path/test_upload.csv
-        If an item in the upload has a column value with a comma, insert that item individually""", 
-             "stats": """        Stats produces a table of statistics for a search query. All arguments are processed as a 'search' command.
-        Statistics table includes a row count, unique item count, sum, average, standard deviation, minimum, and maximum
+        Example: upload /path/directory/test_upload.csv""", 
+             "stats": """        Creates a table of statistic values for a search query. All arguments are processed as a 'search' command.
 
         Example: stats -g science fiction -y 19??""",
-             "export": """        Export writes the output of both a 'search' and 'stats' call to a unique file. 
-        All arguments are processed as a 'search' command
+             "report": """        Creates a simple report from the output of both a 'search', 'stats', and 'plot' call. 
+        All arguments are processed as a 'search' command.
         
-        Example: export -T stories -g science fiction -s author""",
-             "distinct": """        Distinct allows for searching records with the distinct values in the specified column
-        Specific column is stated directly next to the 'distinct' command word
-        Unique flag '-C' or '--command' states how to run the arguments. Commands: 'search', 'stats', 'tsv', and 'export'
+        Example: report -T stories -g science fiction -s author""",
+             "distinct": """        Distinct allows for searching records with the distinct values in the specified column.
+        Distinct value column is stated directly next to the 'distinct' command word.
+        Unique flag '-C' or '--command' states how to run the arguments. Commands: 'search', 'stats', 'tsv', and 'report'
         
         Example: distinct title -F true -s author -C search""",
              "sql": """        The SQL command allows user to enter a raw SQL query. Useful for JOIN queries.
@@ -118,26 +132,30 @@ HELP_TEXT = {"search": """        Example: search -a Harlan Ellison -T short sto
              "tsv": """        Exports a TSV file of a search query. Useful when using library data for other programs.
              
         Example: tsv -F false""",
-             "exit": """        Exit takes no arguments. Used to safely leave the program"""}
+             "exit": """        Exit takes no arguments. Used to safely leave the program.""",
+             "help": """        Prints the general help page, and specific help pages for all the following arguments.
+             
+        Example: help plot stats upload"""}
 
 # default help text
 HELP_STANDARD = """
     Command list:
-        search      performs SELECT SQL function
-        distinct    performs SELECT DISTINCT SQL function
-        insert      performs INSERT INTO SQL function
-        remove      performs DELETE SQL function
-        sum         performs SUM SQL function
-        count       performs COUNT SQL function
-        average     performs AVG SQL function
+        search      performs the SELECT SQL function
+        distinct    performs the SELECT DISTINCT SQL function
+        insert      performs the INSERT INTO SQL function
+        remove      performs the DELETE SQL function
+        sum         performs the SUM SQL function
+        count       performs the COUNT SQL function
+        avg         performs the AVG SQL function
         update      performs the UPDATE SQL function
         plot        prints a simple graph of an aggregated query
         stats       outputs a statistics table on a 'search' command
+        report      creates a simple report from query output
         change      allows host table and user change
-        upload      allows for bulk 'insert' from CSV file
-        export      allows writing query output to a text file
+        upload      allows for bulk 'insert' from CSV or TSV file
         sql         allows user to enter a raw SQL query
         tsv         allows user to export data for use in other applications
+        help        prints a general help page, and command specific help pages
         exit        safely exits program
         
     Terminus supports both GNU and SQL wildcards:
@@ -191,6 +209,7 @@ CONFIRM_PW = "Confirm new password: "
 SETUP_MSG = "     System Set-Up"
 CLOSE = "\nDatabase connection closed"
 
+# default session variables for clearing the terminal, and setting the terminal window title
 CLEAR = "clear"
 TERMINAL_TITLE = "title " + VERSION
 
@@ -199,10 +218,13 @@ def ret_flag(inpt, i):
     return (inpt[i][1:3] if inpt[i] not in CAPS.keys() else CAPS[inpt[i]]) if len(inpt[i]) > 2 else inpt[i]
 
 
+# prints error message for when a non-existent function is called
 def funct_err(cmd): return "\nInvalid function '" + cmd + "': enter 'help' for more information."
 
 
+# prints the first line of the help command's output
 def help1(info): return "    " + VERSION + " '" + info + "' supported flags: "
 
 
+# prints the header for command specific help section
 def help2(inpt): return "\n    Command help '" + inpt + "': "

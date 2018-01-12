@@ -5,7 +5,7 @@ import statics
 
 
 def format_quote(quote):
-    """Formats quotes which trail multiple lines by line breaking between words.
+    """Formats quotes which trail multiple lines by inserting newlines between words.
     Otherwise, lines will often be split mid word."""
     barrier = statics.WIDTH - statics.BOUNDS
     length = len(quote)
@@ -48,6 +48,9 @@ def main():
     session.title()
     session.clear_screen()
     
+    # info[0] = sqlite DB connection
+    # info[1] = current host table
+    # info[2] = user name (for printing the command prompt)
     info = [None, None, None]
     info[0] = session.get_connection()
     home_screen(info[0])

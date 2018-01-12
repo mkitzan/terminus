@@ -57,26 +57,29 @@ Each axis flag has a DB column specified, and one of those two states the aggreg
 - change, allows user to change host table, or change user entirely.
 
       user@host: change -h short stories -u test_user pw1234
-- upload, performs a file upload from CSV to the current host table.
+- distinct, performs the function of a SQL SELECT DISTINCT.
+Distinct value column is stated directly next to the 'distinct' command word.
+
+	  user@host: distinct title -C search -F true -s author
+- upload, performs a file upload from a CSV or TSV file to the current host table.
 
       user@host: upload /directory/path/test_upload.csv
 - stats, outputs a statistics table for a search query. All arguments are processed as a 'search' command.
 
       user@host: stats -F true
-- export, writes the output of both a 'search' and 'stats' call to a file (named 'd/m/y DB Export.txt'). 
+- report, writes the output of 'search', 'stats', and 'plot' calls to a file (named 'd/m/y Library Export.txt'). 
 All arguments are processed as a 'search' command.
         
-	  user@host: export -T stories -g science fiction -s author
+	  user@host: report -T stories -g science fiction -s author
 - sql, allows user to execute a raw SQL statement. The statement can't query sqlite_master nor credentials.
-Must declare either search or stats as the first argument.
+Must declare either 'search', 'stats', and 'tsv' as the first argument.
 
 	  user@host: sql search SELECT title, author, year FROM books UNION SELECT title, author, year FROM stories
 - tsv, allows user to export a query as a tsv file for use in other programs or applications.
 
 	  user@host: tsv -F false -T not manga -T not art book
-- help, displays general and host specific use information. 'help command_here' includes use information for that command.
-
-      user@host: help upload
+- help, prints the general help page, and specific help pages for all the following arguments.
+      user@host: help upload plot search
 - exit, safely leaves Terminus
 
       user@host: exit

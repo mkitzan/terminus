@@ -226,7 +226,7 @@ def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, r
     ROUND = remainder
     NVALID = nvalid
     
-    expfile = open(PATH + strftime("%d-%m-%Y") + " Library Export.txt", "w+")
+    expfile = open(PATH + strftime("%d-%m-%Y") + " Library Report.txt", "w+")
     expfile.write(strftime("%d/%m/%Y %H:%M:%S") + "\n\nHost Table: " + tb + "\nArguments:  " + args + "\n\nResults Set\n")
     
     table(columns, values, point, buffer_val, lambda x: expfile.write(x + "\n"))

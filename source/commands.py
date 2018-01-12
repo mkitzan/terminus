@@ -11,12 +11,12 @@ def tsv(inpt, info):
     sql_query = query.parse_sql(inpt, info[1], "search")
     
     columns, results = query.execute_sql(info[0], sql_query)
-    fileout(columns, results, "\t")
+    fileout(columns, results, "\t", info[1])
 
 
-def fileout(columns, results, delim):
+def fileout(columns, results, delim, host):
     """Helper function to write a result set to a TSV file."""
-    with open("library-export.tsv" if delim == "\t" else "library-export.csv", "w") as outfile:
+    with open(host + ("-export.tsv" if delim == "\t" else "-export.csv"), "w") as outfile:
         outfile.write(delim.join(columns) + "\n")
         for row in results:
             outfile.write(delim.join([str(i) for i in row]) + "\n")
@@ -37,6 +37,9 @@ def sql(inpt, info):
         dataprint.table(columns, results)
     elif command == "stats":
         dataprint.stats(columns, results)
+    elif command == "tsv":
+        fileout(columns, results, "\t", info[1])
+        return
         
     input(statics.PAUSE)
 
@@ -47,7 +50,8 @@ def plot(inpt, info):
     args = {"whr": [], "-X": [], "-Y": []}
     agg = ["count", "sum", "avg"]
     temp = []
-    spec_vars = [False, 1, "count", "-Y"] # WHERE exists, scale, operation type, aggregated axis
+    # WHERE exists, scale, operation type, aggregated axis
+    spec_vars = [False, 1, "count", "-Y"]
 
     # creates lists of each flags arguments
     for el in reversed(inpt):
@@ -144,14 +148,17 @@ def prepare_row(row):
 
 
 def upload(inpt, info):
-    """Uploads a CSV into the current DB host table."""
-    # loops through the file counting rows in the CSV
+    """Uploads a CSV or TSV into the current DB host table."""
+    # loops through the file counting rows
     file_len = 0
     for line in open(inpt[0], "r"):
         file_len += 1
+    
+    # sets the row processing function depending on file format
+    funct = (lambda r: "', '".join(prepare_row(r))) if inpt[0][-3:] == "csv" else (lambda r: r.replace("\t", "', '"))
 
     with open(inpt[0], "r") as file:
-        row = file.readline()
+        row = file.readline().strip("\n")
         curr = 1
         
         while row:
@@ -159,20 +166,20 @@ def upload(inpt, info):
             ratio = curr / file_len
             progress = ceil(ratio * statics.PROGRESS)
             ratio = ceil(ratio * 100)
-            row = "', '".join(prepare_row(row.strip("\n")))
+            row = funct(row)
 
             # prints the progress bar
             session.clear_screen()
-            print(info[2] + "@" + info[1] + ": " + "upload " + inpt[0]) 
+            print(info[2] + "@" + info[1] + ": " + "upload " + " ".join(inpt)) 
             print("\n    |" + ("#" * progress) + (" " * (statics.PROGRESS - progress)) + "|  " + str(ratio) + "%")
             print("\n    '" + row + "'")
             
             sql_query = "INSERT INTO " + info[1] + "(" + ", ".join(statics.HOST_SET[info[1]]) + ")" \
                                                    " VALUES('" + row + "')"
-            
+
             query.execute_sql(info[0], sql_query)
             curr += 1
-            row = file.readline()
+            row = file.readline().strip("\n")
     
         info[0].commit()
 
@@ -212,17 +219,17 @@ def update(inpt, info):
 
 
 def sum(inpt, info):
-    """aggregate helper function, passes SUM"""
+    """Helper function for 'aggregate', passes SUM"""
     aggregate("SUM", inpt, info)
 
 
 def count(inpt, info):
-    """aggregate helper function, passes COUNT"""
+    """Helper function for 'aggregate', passes COUNT"""
     aggregate("COUNT", inpt, info)
 
 
 def average(inpt, info):
-    """aggregate helper function, passes AVG"""
+    """Helper function for 'aggregate', passes AVG"""
     aggregate("AVG", inpt, info)  
 
 
@@ -235,13 +242,13 @@ def aggregate(agg, inpt, info):
     input(statics.PAUSE)
     
     
-def export(inpt, info):
-    """Performs a search with the input, then passes the results to dataprint's export."""
+def report(inpt, info):
+    """Performs a search with the input, then passes the results to dataprint's export to create a simply report."""
     args = [el for el in inpt]
     sql_query = query.parse_sql(inpt, info[1], "search")
 
     columns, results = query.execute_sql(info[0], sql_query)
-    dataprint.export(columns, results, info[1], "export " + " ".join(args))
+    dataprint.export(columns, results, info[1], "report " + " ".join(args), plot_res=True)
 
 
 def search(inpt, info):
@@ -267,7 +274,7 @@ def find_op(inpt):
     
 def distinct(inpt, info):
     """Executes a standard search query, then cuts out non-distinct records.
-    After, executes dataprint functions: stats, export, or search on the results set."""
+    After, executes dataprint functions: stats, report, or search on the results set."""
     op = find_op(inpt)
         
     sql_query = query.parse_sql(inpt[1:], info[1], "search")
@@ -289,11 +296,11 @@ def distinct(inpt, info):
         
     if op == "stats":
         dataprint.stats(columns, results)
-    elif op == "export":
+    elif op == "report":
         dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt), plot_res=True)
         return
     elif op == "tsv":
-        fileout(columns, results, "\t")
+        fileout(columns, results, "\t", info[1])
         return
     elif op == "search":
         dataprint.table(columns, results)
@@ -339,8 +346,8 @@ def cmd_help(inpt, info):
 
     print(statics.HELP_STANDARD)
 
-    if len(inpt) > 0:
-        print(statics.help2(inpt[0]))
-        print(statics.HELP_TEXT[inpt[0]] if inpt[0] in query.FUNCTIONS.keys() else statics.CMD_ERROR)
+    for el in inpt:
+        print(statics.help2(el))
+        print(statics.HELP_TEXT[el] if el in query.FUNCTIONS.keys() else statics.CMD_ERROR)
 
     input(statics.PAUSE)

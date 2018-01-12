@@ -7,10 +7,10 @@ import statics
 FUNCTIONS = {"search": commands.search, "insert": commands.insert,
              "remove": commands.remove, "update": commands.update,
              "exit": commands.close_out, "sum": commands.sum,
-             "count": commands.count, "average": commands.average,
+             "count": commands.count, "avg": commands.average,
              "plot": commands.plot, "change": commands.change, 
              "help": commands.cmd_help, "upload": commands.upload, 
-             "stats": commands.cmd_stats, "export": commands.export, 
+             "stats": commands.cmd_stats, "report": commands.report, 
              "distinct": commands.distinct, "sql": commands.sql,
              "tsv": commands.tsv}
 
