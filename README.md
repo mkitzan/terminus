@@ -1,11 +1,11 @@
 # Terminus: Terminal Library Database
-The third iteration of the terminal based library database. Unlike the previous java versions this one is written in python.
-With each iteration, I have overhauled the interface style. Terminus is a pure bash experience. 
+This is the third iteration of the terminal based library database. Unlike the previous java versions this iteration is written in python.
+With each iteration, I have overhauled the interface style. Terminus is a pure bash styled experience. 
 Flags are finally supported rather than weird file path syntax: python was chosen to make flag processing easier.
-The previous versions had, to varying degrees of severity, input syntax dissonance where no truly uniform command input syntax existed. 
-The input syntax has now been unified under the comfortable, user friendly, flag style.
-Unlike the previous versions, Terminus was designed to be table scalable. 
-In previous versions it would have been a nightmare to integrate new table into the system; however, now it's fairly straight forward.
+The previous versions had, to varying degrees of severity, command syntax dissonance, where no truly uniform syntax existed. 
+The input syntax has now been unified under the comfortable, user friendly, flag style. 
+Unlike the previous versions, Terminus was designed to be table, and column scalable. 
+In previous versions it would have been a nightmare to integrate new table into the system; however, now it's fairly straight forward. Implementing a new column or table involves adding values to datastructures in the the theme file ('statics.py'), and performing SQL operations to add the table or column.
 
 # Features
 - 3 library host tables (books, stories, quotes), and 1 administrative host table (records)
@@ -20,12 +20,12 @@ In previous versions it would have been a nightmare to integrate new table into 
 - Download files, create a directory for Terminus (consider creating a desktop shortcut to one of the start-up scripts)
 - Make sure you have sqlite3 installed on your machine (https://www.sqlite.org/download.html)
 - Run set-up.py from terminal, it will prompt you to create a new user
-- Create a CSV of your current library using the expected column ordering format (title, author, genre, year, pages, type, format, finished).
+- Create a CSV or TSV of your current library using the expected column ordering format (title, author, genre, year, pages, type, format, finished)
 Beware of single quotes, SQL syntax expects two single quotes ('') in the place of a one single quote (')
 - Execute an 'upload' command
 
 # General Use
-Either run python3 terminus.py, or one of the scripts to launch the program. 
+Either run python3 source/terminus.py, or one of the scripts to launch the program. 
 Enter the username/password you created in the initial set-up. Begin normal use.
 
 # Command List
@@ -53,14 +53,14 @@ Enter the username/password you created in the initial set-up. Begin normal use.
 - plot, prints a simple graph of an aggregated query.
 Each axis flag has a DB column specified, and one of those two states the aggregate type and the scale to plot by.
 
-	  user@host: plot -X author -Y count title 1 -F true
+      user@host: plot -X author -Y count title 1 -F true
 - change, allows user to change host table, or change user entirely.
 
       user@host: change -h short stories -u test_user pw1234
 - distinct, performs the function of a SQL SELECT DISTINCT.
 Distinct value column is stated directly next to the 'distinct' command word.
 
-	  user@host: distinct title -C search -F true -s author
+      user@host: distinct title -C search -F true -s author
 - upload, performs a file upload from a CSV or TSV file to the current host table.
 
       user@host: upload /directory/path/test_upload.csv
@@ -70,15 +70,16 @@ Distinct value column is stated directly next to the 'distinct' command word.
 - report, writes the output of 'search', 'stats', and 'plot' calls to a file (named 'd/m/y Library Export.txt'). 
 All arguments are processed as a 'search' command.
         
-	  user@host: report -T stories -g science fiction -s author
+      user@host: report -T stories -g science fiction -s author
 - sql, allows user to execute a raw SQL statement. The statement can't query sqlite_master nor credentials.
 Must declare either 'search', 'stats', and 'tsv' as the first argument.
 
-	  user@host: sql search SELECT title, author, year FROM books UNION SELECT title, author, year FROM stories
+      user@host: sql search SELECT title, author, year FROM books UNION SELECT title, author, year FROM stories
 - tsv, allows user to export a query as a tsv file for use in other programs or applications.
 
-	  user@host: tsv -F false -T not manga -T not art book
+      user@host: tsv -F false -T not manga -T not art book
 - help, prints the general help page, and specific help pages for all the following arguments.
+      
       user@host: help upload plot search
 - exit, safely leaves Terminus
 
@@ -103,7 +104,7 @@ Collection column/flag denotes the short story collection the story comes from
 
 # Integrating a New Table
 - Open library.db in sqlite3, add the new table
-- If new column labels were used that do not exist in statics.py, include them in 'FLAGS' and 'ALL_COLUMNS'
-- With the new column, update the dictionary 'HOST_SET' in statics.py
-- Describe any new column in the 'FLAGS_HELP' dictionary in statics.py
-- Finally update the upload section in 'HELP_TEXT' dictionary in statics.py
+- If new column labels were used that do not exist in 'statics.py', include them in 'FLAGS'
+- Add the new table's name, and column names (in order) into HOST_SET, as a key (table name):value (list of columns) pair
+- Describe any new column in the 'FLAG_HELP' dictionary in statics.py
+- Finally update the upload section in 'HELP_TEXT' dictionary in statics.py by appending the table and column flags to the table
