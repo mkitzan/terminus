@@ -7,6 +7,7 @@ from os import system
 from hashlib import sha256
 from getpass import getpass
 from time import strftime
+from shutil import get_terminal_size
 
 
 def create_record(inpt, info):
@@ -78,14 +79,29 @@ def change_host(db, host):
     curs.close()
     
     return valid
+    
+    
+def terminal_size():
+    """Sets variable related to the terminal size"""
+    cols, rows = get_terminal_size()
+    ratio = statics.BOUNDS / statics.WIDTH
+    
+    statics.WIDTH = cols
+    statics.BOUNDS = statics.WIDTH - int(statics.WIDTH * ratio)
+    
+    if cols < statics.BOUNDS:
+        # 14 = amount of constant space taken by progress bar
+        statics.PROGRESS = abs(cols - 14)
 
 
 def system_vars():
     """Sets variables often used throughout the active session."""
+    terminal_size()
+    
     if name == "nt":
         statics.CLEAR = "cls"
     elif name == "posix":
-        statics.TERMINAL_TITLE = "echo -e '\033]2;'" + statics.VERSION + "'\007'"  
+        statics.TERMINAL_TITLE = "echo -e '\033]2;'" + statics.VERSION + "'\007'"
 
 
 def clear_screen():
@@ -93,7 +109,7 @@ def clear_screen():
     system(statics.CLEAR)
 
 
-def title():
+def title(extra=""):
     """Sets the terminal title."""
     system(statics.TERMINAL_TITLE)
 

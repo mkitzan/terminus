@@ -162,6 +162,9 @@ def upload(inpt, info):
         curr = 1
         
         while row:
+            # adjusts statics.PROGRESS if there is a change in terminal size while running
+            session.terminal_size()
+            
             # processes progress ratios
             ratio = curr / file_len
             progress = ceil(ratio * statics.PROGRESS)

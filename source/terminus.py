@@ -6,17 +6,17 @@ import statics
 
 def format_quote(quote):
     """Formats quotes which trail multiple lines by inserting newlines between words.
-    Otherwise, lines will often be split mid word."""
+    Otherwise, lines will often be split mid word.""" 
     barrier = statics.WIDTH - statics.BOUNDS
     length = len(quote)
 
-    while barrier+statics.BOUNDS < length:
+    while barrier < length:
         for i in range(statics.BOUNDS):
             if quote[barrier+i] == " ":
                 quote = quote[:barrier+i] + "\n " + quote[barrier+i:]
                 break
 
-        barrier += statics.WIDTH-(statics.BOUNDS-20)
+        barrier += statics.WIDTH - statics.BOUNDS
 
     return quote
 

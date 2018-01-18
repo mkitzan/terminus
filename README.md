@@ -8,18 +8,18 @@ Unlike the previous versions, Terminus was designed to be table, and column scal
 In previous versions it would have been a nightmare to integrate new table into the system; however, now it's fairly straight forward. Implementing a new column or table involves adding values to datastructures in the the theme file ('statics.py'), and performing SQL operations to add the table or column.
 
 # Features
-- 3 library host tables (books, stories, quotes), and 1 administrative host table (records)
-- 17 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export...
+- 4 library host tables (books, stories, quotes, wishlist), and 1 administrative host table (records)
+- 18 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export...
 - User/password system
 - Full wildcard support
 - Case insensitive searching
-- 8 data points for 'books', 6 data points for 'stories', 4 data points for 'quotes', and 5 data points for 'records'
+- 8 data points for 'books', 6 data points for 'stories', 4 data points for 'quotes', 7 data points for 'wishlist', and 5 data points for 'records'
 - The Litany Against Fear
 
 # Initial Set-up
 - Download files, create a directory for Terminus (consider creating a desktop shortcut to one of the start-up scripts)
 - Make sure you have sqlite3 installed on your machine (https://www.sqlite.org/download.html)
-- Run set-up.py from terminal, it will prompt you to create a new user
+- Run setup.py from a terminal, it will allow you to create a new user
 - Create a CSV or TSV of your current library using the expected column ordering format (title, author, genre, year, pages, type, format, finished)
 Beware of single quotes, SQL syntax expects two single quotes ('') in the place of a one single quote (')
 - Execute an 'upload' command
@@ -78,6 +78,10 @@ Must declare either 'search', 'stats', and 'tsv' as the first argument.
 - tsv, allows user to export a query as a tsv file for use in other programs or applications.
 
       user@host: tsv -F false -T not manga -T not art book
+- system, allows user to create new DB objects from within the program.
+Applicable DB objects include new tables, users, columns (for existing tables).
+
+	  user@host: system user table
 - help, prints the general help page, and specific help pages for all the following arguments.
       
       user@host: help upload plot search
@@ -92,6 +96,8 @@ Must declare either 'search', 'stats', and 'tsv' as the first argument.
 
 'quotes' host table has 4 columns: title (-t), author (-a), year (-y), quote (-q)
 
+'wishlist' host table has 7 columns: title (-t), author (-a), genre (-g), year (-y), pages (-p), type (-T), priority (-P)
+
 'records' host table has 5 columns: date (-d), user (-u), operation (-o), host (-h), arguments (-A)
 
 Type column/flag denotes whether the books is a novel, short stories...
@@ -103,7 +109,10 @@ Finished column/flag denotes whether you have finished the book
 Collection column/flag denotes the short story collection the story comes from
 
 # Integrating a New Table
-- Open library.db in sqlite3, add the new table
+- Open setup.py from within a terminal, and enter 'table' at the chevrons
+- Alternatively, enter 'system table' from within Terminus itself
+- Enter and confirm the new table name
+- Enter as many column label, data type, constraints as needed
 - If new column labels were used that do not exist in 'statics.py', include them in 'FLAGS'
 - Add the new table's name, and column names (in order) into HOST_SET, as a key (table name):value (list of columns) pair
 - Describe any new column in the 'FLAG_HELP' dictionary in statics.py

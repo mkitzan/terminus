@@ -1,13 +1,13 @@
-VERSION = "Terminus v2.3"
+VERSION = "Terminus v2.4"
 
-# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.4
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.5
 TITLE = """
-      _______                  _                         ___    ____  
-     |__   __|                (_)                       |__ \  |___ \ 
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) |   __) |
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /   |__ < 
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ ___) |
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)____/
+      _______                  _                         ___  _  _   
+     |__   __|                (_)                       |__ \| || |  
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) | || |_ 
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /|__   _|
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ | |  
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)|_|
      Terminal Library Database
     """
 
@@ -15,10 +15,11 @@ TITLE = """
 DB = "library.db"
 DEFAULT_HOST = "books"
 
-# numbers used in formatting the progress bar, and quote on the landing page
-WIDTH = 125
-BOUNDS = 35
-HEIGHT = 35
+# terminal width
+WIDTH = 130
+# minimum white space between quote and right edge of terminal
+BOUNDS = 100
+# length of progress bar in upload command
 PROGRESS = 35
 
 # error and pause text
@@ -28,7 +29,7 @@ LOGIN_ERROR = "\nInvalid login credentials"
 CMD_ERROR = "        Invalid command"
 EXCEPT = "\nTry: help "
 
-# logic ops available in queries
+# logic ops available in queries val0 = back-index to cut list by, val1 SQL argument
 LOGIC_OPS = {"v": [-1, "' OR "], "^": [-1, "' AND "], "!": [-3, " NOT "]}
 
 # names of tables not allowed to be accessed
@@ -40,15 +41,16 @@ PARSE = {"remove": lambda h: "DELETE FROM " + h}
 FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-y": "Year", "-p": "Pages", "-f": "Format", "-F": "Finished", 
          "-c": "Collection", "-q": "Quote", "-d": "Date", "-o": "Operation",
-         "-h": "Host", "-u": "User", "-A": "Arguments"}
+         "-h": "Host", "-u": "User", "-A": "Arguments", "-P": "Priority"}
         
 # all flags with capital short flags
-CAPS = {"--type": "-T", "--finished": "-F", "arguments": "-A"}
+CAPS = {"--type": "-T", "--finished": "-F", "--arguments": "-A", "--priority": "-P"}
 
 # list of columns for each table (in order)
 HOST_SET = {"books": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Format", "Finished"],
             "stories": ["Title", "Author", "Genre", "Year", "Pages", "Collection", "Finished"],
             "quotes": ["Title", "Author", "Year", "Quote"],
+            "wishlist": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Priority"],
             "records": ["Date", "User", "Operation", "Host", "Arguments"]}
 
 # help text for each flag/column
@@ -66,7 +68,8 @@ FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
              "User": "        -u or --user        flag specifies the user",
              "Operation": "        -o or --operation   flag specifies the operation used",
              "Host": "        -h or --host        flag specifies the host",
-             "Arguments": "        -A or --arguments   flag specifies the command arguments"}
+             "Arguments": "        -A or --arguments   flag specifies the command arguments",
+             "Priority": "        -P or --priority    flag specifies the book's acquisition priority"}
 
 # help text for each command function
 HELP_TEXT = {"search": """        The go to command for querying the host table's records. 
@@ -111,6 +114,7 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
             stories:    -t, -a, -g, -y, -p, -c, -F
             quotes:     -t, -a, -y, -q
             records:    -d, -u, -o, -h, -A
+            wishlist:   -t, -a, -g, -y, -p, -T, -P
             
         Example: upload /path/directory/test_upload.csv""", 
              "stats": """        Creates a table of statistic values for a search query. All arguments are processed as a 'search' command.
@@ -132,6 +136,11 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
              "tsv": """        Exports a TSV file of a search query. Useful when using library data for other programs.
              
         Example: tsv -F false""",
+             "system": """        Allows user ability to add new users, tables, or columns from inside the program.
+        System has acceptable arguments corresponding to the new DB object to create: user, table, column.
+        Multiple arguments can be present: they will be evaluated in order.
+        
+        Example: system user table""",
              "exit": """        Exit takes no arguments. Used to safely leave the program.""",
              "help": """        Prints the general help page, and specific help pages for all the following arguments.
              
@@ -155,6 +164,7 @@ HELP_STANDARD = """
         upload      allows for bulk 'insert' from CSV or TSV file
         sql         allows user to enter a raw SQL query
         tsv         allows user to export data for use in other applications
+        system      allows user to create new DB objects
         help        prints a general help page, and command specific help pages
         exit        safely exits program
         
@@ -178,10 +188,12 @@ HELP_STANDARD = """
             Example: stats -y ! 196? ^ 19?? -g science fiction
             Matches all sci-fi books published in the 1900's but not in 1960's"""
 
+# user selection menu text for set-up.py
 SETUP_OPTIONS = """ Set-up Options
         
 Create a new user:    [user]
 Create a new table:   [table]
+Add column to table:  [column]
 Open help page:       [help]
 Safely exit set-up:   [exit]
 """
@@ -206,6 +218,33 @@ NEW_USER = "Enter new username: "
 NEW_PW = "Enter new password: "
 CONFIRM_PW = "Confirm new password: "
 
+TABLE = "Table"
+NEW_TABLE = "Enter table name:    "
+CONFIRM_TABLE = "Confirm table name:  "
+
+END = "end"
+REDO = "redo"
+
+COLUMN_TEXT = "Columns\nEnter '" + REDO + "' to restart inputting columns\nEnter '" + END + "' to finish inputting columns\n"
+
+COLUMN_GET = ["Enter column name:   ",
+               "Enter datatype:      ",
+               "Enter constraint:    "]
+
+# input line indicator for user input without preceding text in set-up.py               
+CHEVRON = ">>> "
+
+EXPLAIN1 = """    If new column labels were used that do not exist in statics.FLAGS, add the columns and flag as a key (flag): value (label) pair
+    Add to statics.HOST_SET the table name and column list (in order you want them to appear in), as a key (table name): value (column list) pair
+    Add to statics.FLAG_HELP the flag name (column label) and help text for that flag, for any new flags created
+    Update the statics.HELP_TEXT for 'upload' by appending the table name and column/flag ordering"""
+    
+EXPLAIN2 = """    Add the columns and flag as a key (flag): value (label) pair if column labels did not previously exist
+    Add to statics.HOST_SET the new column to the altered table's list
+    Add to statics.FLAG_HELP the flag name (column label) and help text for that flag
+    Update the statics.HELP_TEXT for 'upload' by appending column/flag ordering to the altered table
+    """
+
 SETUP_MSG = "     System Set-Up"
 CLOSE = "\nDatabase connection closed"
 
@@ -213,9 +252,17 @@ CLOSE = "\nDatabase connection closed"
 CLEAR = "clear"
 TERMINAL_TITLE = "title " + VERSION
 
+OTHER_PART =  " in the DB\n\nTo finish the implementation of the table open 'statics.py' perform the following adjustments:\n"
+
+
 # print functions which take some variable input
 def ret_flag(inpt, i):
     return (inpt[i][1:3] if inpt[i] not in CAPS.keys() else CAPS[inpt[i]]) if len(inpt[i]) > 2 else inpt[i]
+
+
+# prints message about adjusting statics.py
+def adjust(table, adj):
+    return "The table '" + table + "' has been " + adj + OTHER_PART
 
 
 # prints error message for when a non-existent function is called

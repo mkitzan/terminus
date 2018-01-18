@@ -1,5 +1,6 @@
 import statistics
 
+from shutil import get_terminal_size
 from time import strftime
 from math import ceil
 
@@ -122,21 +123,44 @@ def plot(columns, results, op, scale, flg, point="*", buffer_val=0, funct=print)
         plot_aggregate_y(columns, res, max_y, max_x, buffer_val, point, scale, op, funct)
             
 
-def border(max_lens, point):
-    """Creates the horizontal border for the results table."""
-    return "".join([point + "-"*i for i in max_lens]) + point
+def borders(max_lens, point):
+    """Creates horizontal borders for the results table."""
+    cols, rows = get_terminal_size()
+    
+    top_border = bot_border = tb_border = "".join([point + "-"*i for i in max_lens]) + point
+    breaks = []
+    
+    if cols < len(tb_border):
+        start = cols * (len(breaks) + 1)
+        i = 0
+        
+        while start < len(tb_border):
+            if tb_border[start-i] == point:
+                breaks += [start-i+1]
+                start = cols * (len(breaks) + 1)
+                i = -1
+            i += 1
+            
+        top_border = tb_border[:breaks[0]]
+        bot_border = tb_border[breaks[-1]:]
+        
+    return breaks, top_border, bot_border
 
 
-def make_row(values, val_bufs):
+def make_row(values, val_bufs, breaks=[]):
     """Creates a row for the results table."""
-    return "|" + "|".join([str(values[i]) + " " * val_bufs[i] for i in range(len(values))]) + "|"
+    row = "|" + "|".join([str(values[i]) + " " * val_bufs[i] for i in range(len(values))]) + "|"
+
+    for i in range(len(breaks)):
+        row = row[:breaks[i]+i] + "\n" + row[breaks[i]+i:]
+        
+    return row
 
 
 def buffers(columns, values, buffer_val):
     """Processes the space multiple for buffers between records value and column borders."""
     max_lens = [len(str(i)) for i in columns]
     val_lens = [[i for i in max_lens]]
-    roll_over = []
 
     for i in values:
         cur_lens = []
@@ -152,23 +176,23 @@ def buffers(columns, values, buffer_val):
     return [[max_lens[i]+buffer_val - el[i] for i in range(len(el))] for el in val_lens], [i+buffer_val for i in max_lens]
 
 
-def print_data(tb_border, columns, values, val_bufs, funct):
+def print_data(breaks, top_border, bot_border, columns, values, val_bufs, funct):
     """Creates the actual table from the processed data."""
-    funct(tb_border + "\n" + make_row(columns, val_bufs[0]) + "\n" + tb_border)
+    funct(top_border + "\n" + make_row(columns, val_bufs[0], breaks) + "\n" + bot_border)
 
     for i in range(len(values)):
-        funct(make_row(values[i], val_bufs[i + 1]))
+        funct(make_row(values[i], val_bufs[i+1], breaks))
 
-    funct(tb_border)
+    funct(bot_border)
 
 
 def table(columns, values, point="*", buffer_val=1, funct=print):
     """Calls functions to prepare for printing."""
     val_bufs, max_lens = buffers(columns, values, buffer_val)
+    
+    breaks, top_border, bot_border = borders(max_lens, point)
 
-    tb_border = border(max_lens, point)
-
-    print_data(tb_border, columns, values, val_bufs, funct)
+    print_data(breaks, top_border, bot_border, columns, values, val_bufs, funct)
     
 
 def process(values, columns):

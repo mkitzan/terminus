@@ -1,6 +1,7 @@
 import session
 import commands
 import statics
+import setup
 
 
 # function dictionary which is used to correctly call the user's command
@@ -12,7 +13,7 @@ FUNCTIONS = {"search": commands.search, "insert": commands.insert,
              "help": commands.cmd_help, "upload": commands.upload, 
              "stats": commands.cmd_stats, "report": commands.report, 
              "distinct": commands.distinct, "sql": commands.sql,
-             "tsv": commands.tsv}
+             "tsv": commands.tsv, "system": setup.from_terminus}
 
 
 def execute_sql(db, sql_query):
@@ -103,6 +104,7 @@ def run_command(command, info):
         input(statics.funct_err(command[0]))
     else:
         print()
+
         try:
             session.create_record(command, info)
             FUNCTIONS[command[0]](command[1:], info)
