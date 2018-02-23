@@ -1,13 +1,13 @@
-VERSION = "Terminus v2.4"
+VERSION = "Terminus v2.5"
 
-# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.5
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.6
 TITLE = """
-      _______                  _                         ___  _  _   
-     |__   __|                (_)                       |__ \| || |  
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) | || |_ 
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /|__   _|
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ | |  
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)|_|
+	  _______                  _                         ___    _____ 
+	 |__   __|                (_)                       |__ \  | ____|
+		| | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) | | |__  
+		| |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /  |___ \ 
+		| |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ ___) |
+		|_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)____/
      Terminal Library Database
     """
 
@@ -17,8 +17,8 @@ DEFAULT_HOST = "books"
 
 # terminal width
 WIDTH = 130
-# minimum white space between quote and right edge of terminal
-BOUNDS = 100
+# length of a line for quote ate title screen
+BOUNDS = 90
 # length of progress bar in upload command
 PROGRESS = 35
 

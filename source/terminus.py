@@ -12,7 +12,7 @@ def format_quote(quote):
 
     while barrier < length:
         for i in range(statics.BOUNDS):
-            if quote[barrier+i] == " ":
+            if barrier+i < len(quote) and quote[barrier+i] == " ":
                 quote = quote[:barrier+i] + "\n " + quote[barrier+i:]
                 break
 

@@ -25,9 +25,8 @@ def fileout(columns, results, delim, host):
 def sql(inpt, info):
     """Runs a raw SQL query."""
     # checks if query is accessing a blocked table
-    for el in inpt:
-        if el in statics.BLOCKED:
-            return
+    if set(inpt).intersection(set(statics.BLOCKED)) is not {}:
+        return
     
     command = inpt.pop(0)
     sql_query = " ".join(inpt)
