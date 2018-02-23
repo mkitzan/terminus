@@ -176,7 +176,7 @@ HELP_STANDARD = """
         NOT:    By placing '!' in front of the argument, Terminus matches only if the argument is NOT true.
         
             Example: search -y ! 19??, 
-            Matches all books in the DB published in the 1900's
+            Matches all books in the DB not published in the 1900's
 
         OR:     By placing 'v' between two values following a flag, you can create queries which a value OR another.
         
