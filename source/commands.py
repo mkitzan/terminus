@@ -4,6 +4,46 @@ import statics
 import dataprint
 
 from math import ceil
+from time import strftime
+
+
+def script_vars(inpt):
+    """Creates a dictionary of script variables and finds script file name."""
+    infile = ""
+    var_dict = {}
+    var = []
+    
+    for i in reversed(range(len(inpt))):
+        if inpt[i] == "-v" or inpt[i] == "--variable":
+            name = var.pop(0).split("=")
+            var_dict["$"+name[0]] = " ".join(name[1:] + var)
+            var = []
+        elif inpt[i] == "-S" or inpt[i] == "--script":
+            infile = "scripts/" + " ".join(var)
+            var = []
+        else:
+            var.insert(0, inpt[i])
+            
+    return infile, var_dict
+
+
+def script(inpt, info):
+    """Runs a custom Terminus script (.trm)."""
+    infile, var_dict = script_vars(inpt)
+    
+    if infile[-4:] != ".trm":
+        input(statics.SCRIPT_ERROR)
+        return
+    
+    with open(infile, "r") as script:
+        for line in script:
+            cmd = line.strip("\n")
+            
+            for var in var_dict:
+                cmd.replace(var, var_dict[var])
+            
+            if cmd != "":
+                query.run_command(cmd, info)
 
 
 def tsv(inpt, info):
@@ -173,7 +213,7 @@ def upload(inpt, info):
             # prints the progress bar
             session.clear_screen()
             print(info[2] + "@" + info[1] + ": " + "upload " + " ".join(inpt)) 
-            print("\n    |" + ("#" * progress) + (" " * (statics.PROGRESS - progress)) + "|  " + str(ratio) + "%")
+            print("\n\n    |" + ("#" * progress) + (" " * (statics.PROGRESS - progress)) + "|  " + str(ratio) + "%")
             print("\n    '" + row + "'")
             
             sql_query = "INSERT INTO " + info[1] + "(" + ", ".join(statics.HOST_SET[info[1]]) + ")" \
@@ -341,6 +381,7 @@ def close_out(inpt, info):
 
 def cmd_help(inpt, info):
     """Prints the correctly formatted help page."""
+    print()
     print(statics.help1(info[1]))
 
     for i in statics.HOST_SET[info[1]]:

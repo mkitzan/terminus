@@ -1,0 +1,2 @@
+distinct title -C report -F TRUE -T ! manga ^ ! art book -s author year title
+

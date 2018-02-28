@@ -1,13 +1,13 @@
-VERSION = "Terminus v2.5"
+VERSION = "Terminus v2.6"
 
-# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.6
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.7
 TITLE = """
-      _______                  _                         ___    _____ 
-     |__   __|                (_)                       |__ \  | ____|
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) | | |__  
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /  |___ \ 
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ ___) |
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)____/
+      _______                  _                         ___     __  
+     |__   __|                (_)                       |__ \   / /  
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) | / /_  
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // / | '_ \ 
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ | (_) |
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)___/
      Terminal Library Database
     """
 
@@ -26,7 +26,8 @@ PROGRESS = 35
 PAUSE = "\nPress enter to continue..."
 HOST_ERROR = "\nInvalid host input"
 LOGIN_ERROR = "\nInvalid login credentials"
-CMD_ERROR = "        Invalid command"
+CMD_ERROR = "\n        Invalid command"
+SCRIPT_ERROR = "\nScript must be a '.trm' file"
 EXCEPT = "\nTry: help "
 
 # logic ops available in queries val0 = back-index to cut list by, val1 SQL argument
@@ -40,31 +41,36 @@ PARSE = {"remove": lambda h: "DELETE FROM " + h}
 # flag and column pairs for all columns throughout the DB
 FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-y": "Year", "-p": "Pages", "-f": "Format", "-F": "Finished", 
-         "-c": "Collection", "-q": "Quote", "-d": "Date", "-o": "Operation",
-         "-h": "Host", "-u": "User", "-A": "Arguments", "-P": "Priority"}
+         "-c": "Collection", "-Q": "Quote", "-d": "Day", "-o": "Operation",
+         "-h": "Host", "-u": "User", "-A": "Arguments", "-P": "Priority",
+         "-m": "Month", "-D": "Date", "-w": "Weekday"}
         
 # all flags with capital short flags
-CAPS = {"--type": "-T", "--finished": "-F", "--arguments": "-A", "--priority": "-P"}
+CAPS = {"--type": "-T", "--finished": "-F", "--arguments": "-A", "--priority": "-P", "--date": "-D"}
 
 # list of columns for each table (in order)
 HOST_SET = {"books": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Format", "Finished"],
             "stories": ["Title", "Author", "Genre", "Year", "Pages", "Collection", "Finished"],
             "quotes": ["Title", "Author", "Year", "Quote"],
             "wishlist": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Priority"],
-            "records": ["Date", "User", "Operation", "Host", "Arguments"]}
+            "records": ["Date", "User", "Operation", "Host", "Arguments"],
+            "tracker": ["Weekday", "Month", "Day", "Year", "Title", "Pages"]}
 
 # help text for each flag/column
 FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
              "Author": "        -a or --author      flag specifies the author",
              "Genre": "        -g or --genre       flag specifies the genre",
-             "Year": "        -y or --year        flag specifies the publishing year",
+             "Year": "        -y or --year        flag specifies the year",
              "Pages": "        -p or --pages       flag specifies the page number",
              "Type": "        -T or --type        flag specifies the type of book ie novel, short stories...",
              "Format": "        -f or --format      flag specifies the book format ie paperback, hardcover...",
              "Finished": "        -F or --finished    flag specifies whether the book's been finished",
              "Collection": "        -c or --collection  flag specifies a short story's collection",
+             "Month": "        -m or --month       flag specifies the month (abbreviated)",
+             "Day": "        -d or --day         flag specifies the day numerial",
+             "Weekday": "        -w or --weekday     flag specifies the weekday name (abbreviated)",
              "Quote": "        -q or --quote       flag specifies a book quote",
-             "Date": "        -d or --date        flag specifies the date in day/mon/year hr:mn:sc",
+             "Date": "        -D or --date        flag specifies the date in day/mon/year hr:mn:sc",
              "User": "        -u or --user        flag specifies the user",
              "Operation": "        -o or --operation   flag specifies the operation used",
              "Host": "        -h or --host        flag specifies the host",
@@ -112,8 +118,9 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         Expected column ordering by host table:
             books:      -t, -a, -g, -y, -p, -T, -f, -F
             stories:    -t, -a, -g, -y, -p, -c, -F
+            tracker:    -w, -m, -d, -y, -t, -p
             quotes:     -t, -a, -y, -q
-            records:    -d, -u, -o, -h, -A
+            records:    -D, -u, -o, -h, -A
             wishlist:   -t, -a, -g, -y, -p, -T, -P
             
         Example: upload /path/directory/test_upload.csv""", 
@@ -130,7 +137,8 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         
         Example: distinct title -F true -s author -C search""",
              "sql": """        The SQL command allows user to enter a raw SQL query. Useful for JOIN queries.
-        The user must declare, immediately after the 'sql' keyword, either 'search' or 'stats'.
+        The user must declare, immediately after the 'sql' keyword, either 'search', 'tsv', 'stats', or 'none' (if there's no output).
+        
              
         Example: sql search SELECT Author, Year FROM books WHERE Year LIKE 19%%""",
              "tsv": """        Exports a TSV file of a search query. Useful when using library data for other programs.
@@ -141,6 +149,13 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         Multiple arguments can be present: they will be evaluated in order.
         
         Example: system user table""",
+             "script": """        Declare the filename of the Terminus script (.trm) to be run with the '-S' flag. 
+        Script variables must be declared with the '-v' flag. The var name and value must be stated with an '=' and no spaces. 
+        Where ever a variable name appears as a distinct token in the script with a '$' preceding it, it will be replaced by the value at run time.
+        Each line in the script will be interpreted as a Terminus command: blank lines will be disregarded.
+        
+        Example: script -S complete.trm -v book_title=Sturgeon is Alive and Well...
+        Any appearances of '$book_title' would be replaced by 'Sturgeon is Alive and Well...'""",
              "exit": """        Exit takes no arguments. Used to safely leave the program.""",
              "help": """        Prints the general help page, and specific help pages for all the following arguments.
              
@@ -165,6 +180,7 @@ HELP_STANDARD = """
         sql         allows user to enter a raw SQL query
         tsv         allows user to export data for use in other applications
         system      allows user to create new DB objects
+        script      allows user to run a .trm script
         help        prints a general help page, and command specific help pages
         exit        safely exits program
         
@@ -228,8 +244,8 @@ REDO = "redo"
 COLUMN_TEXT = "Columns\nEnter '" + REDO + "' to restart inputting columns\nEnter '" + END + "' to finish inputting columns\n"
 
 COLUMN_GET = ["Enter column name:   ",
-               "Enter datatype:      ",
-               "Enter constraint:    "]
+              "Enter datatype:      ",
+              "Enter constraint:    "]
 
 # input line indicator for user input without preceding text in set-up.py               
 CHEVRON = ">>> "

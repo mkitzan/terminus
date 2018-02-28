@@ -8,12 +8,12 @@ Unlike the previous versions, Terminus was designed to be table, and column scal
 In previous versions it would have been a nightmare to integrate new table into the system; however, now it's fairly straight forward. Implementing a new column or table involves adding values to datastructures in the the theme file ('statics.py'), and performing SQL operations to add the table or column.
 
 # Features
-- 4 library host tables (books, stories, quotes, wishlist), and 1 administrative host table (records)
-- 18 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export...
+- 4 library host tables (books, stories, quotes, wishlist), and 2 administrative host table (tracker, records)
+- 19 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export, scripting...
 - User/password system
 - Full wildcard support
 - Case insensitive searching
-- 8 data points for 'books', 6 data points for 'stories', 4 data points for 'quotes', 7 data points for 'wishlist', and 5 data points for 'records'
+- 8 data points for 'books', 6 data points for 'stories', 4 data points for 'quotes', 7 data points for 'wishlist', 6 data points for 'tracker', and 5 data points for 'records'
 - The Litany Against Fear
 
 # Initial Set-up
@@ -71,6 +71,11 @@ Distinct value column is stated directly next to the 'distinct' command word.
 All arguments are processed as a 'search' command.
         
       user@host: report -T stories -g science fiction -s author
+- script, allows user to exceute a Terminus script (.trm). 
+Any script variable must be declared in the script command arguments, and inside the script a variable call must be preceded by '$'.
+Look at the example script 'complete.trm' in the scripts folder.
+
+      user@host: script -S complete.trm -v title=Sturgeon is Alive and Well...
 - sql, allows user to execute a raw SQL statement. The statement can't query sqlite_master nor credentials.
 Must declare either 'search', 'stats', and 'tsv' as the first argument.
 
@@ -98,7 +103,9 @@ Applicable DB objects include new tables, users, columns (for existing tables).
 
 'wishlist' host table has 7 columns: title (-t), author (-a), genre (-g), year (-y), pages (-p), type (-T), priority (-P)
 
-'records' host table has 5 columns: date (-d), user (-u), operation (-o), host (-h), arguments (-A)
+'tracker' host table has 6 columns: weekday (-w), month (-m), day (-d), year (-y), title (-t), pages (-p)
+
+'records' host table has 5 columns: date (-D), user (-u), operation (-o), host (-h), arguments (-A)
 
 Type column/flag denotes whether the books is a novel, short stories...
 

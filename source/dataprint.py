@@ -115,6 +115,9 @@ def plot(columns, results, op, scale, flg, point="*", buffer_val=0, funct=print)
     res += [[str(curr) if num else "".join([word[0] for word in curr.split(" ")]), round(PLOT_OPS[op](temp) / scale)]]
     max_y = set_max_y(res, flg, max_y)
     max_x = set_max_x(res, flg, max_x)
+    
+    if funct == print:
+        print()
 
     if flg == "x":
         plot_aggregate_x(columns, res, max_y, max_x, buffer_val, point, scale, op, funct)
@@ -192,6 +195,9 @@ def table(columns, values, point="*", buffer_val=1, funct=print):
     
     breaks, top_border, bot_border = borders(max_lens, point)
 
+    if funct == print:
+        print()
+        
     print_data(breaks, top_border, bot_border, columns, values, val_bufs, funct)
     
 

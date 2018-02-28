@@ -1,0 +1,6 @@
+change -h books
+update finished TRUE -t $title
+change -h stories
+update finished TRUE -c $title
+change -h books
+
