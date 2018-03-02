@@ -40,7 +40,7 @@ def script(inpt, info):
             cmd = line.strip("\n")
             
             for var in var_dict:
-                cmd.replace(var, var_dict[var])
+                cmd = cmd.replace(var, var_dict[var])
             
             if cmd != "":
                 query.run_command(cmd, info)
