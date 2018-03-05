@@ -12,7 +12,7 @@ TITLE = """
     """
 
 # name of database to connect to
-DB = "library.db"
+DB = "database/library.db"
 DEFAULT_HOST = "books"
 
 # terminal width
@@ -154,7 +154,7 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         Where ever a variable name appears as a distinct token in the script with a '$' preceding it, it will be replaced by the value at run time.
         Each line in the script will be interpreted as a Terminus command: blank lines will be disregarded.
         
-        Example: script -S complete.trm -v book_title=Sturgeon is Alive and Well...
+        Example: script -S complete.trm -v title=Sturgeon is Alive and Well...
         Any appearances of '$book_title' would be replaced by 'Sturgeon is Alive and Well...'""",
              "exit": """        Exit takes no arguments. Used to safely leave the program.""",
              "help": """        Prints the general help page, and specific help pages for all the following arguments.

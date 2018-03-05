@@ -40,8 +40,8 @@ def script(inpt, info):
             cmd = line.strip("\n")
             
             for var in var_dict:
-                cmd.replace(var, var_dict[var])
-            
+                cmd = cmd.replace(var, var_dict[var])
+
             if cmd != "":
                 query.run_command(cmd, info)
 
@@ -290,7 +290,7 @@ def report(inpt, info):
     sql_query = query.parse_sql(inpt, info[1], "search")
 
     columns, results = query.execute_sql(info[0], sql_query)
-    dataprint.export(columns, results, info[1], "report " + " ".join(args), plot_res=True)
+    dataprint.export(columns, results, tb=info[1], args="report " + " ".join(args), source=info[1].capitalize(), plot_res=True)
 
 
 def search(inpt, info):
@@ -339,7 +339,7 @@ def distinct(inpt, info):
     if op == "stats":
         dataprint.stats(columns, results)
     elif op == "report":
-        dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt), plot_res=True)
+        dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt), source=info[1].capitalize(), plot_res=True)
         return
     elif op == "tsv":
         fileout(columns, results, "\t", info[1])

@@ -5,7 +5,7 @@ from time import strftime
 from math import ceil
 
 WINDOW = 180
-PATH = ""
+PATH = "reports/"
 NVALID = "-"
 MISSING = "Not Provided"
 ROUND = 4
@@ -250,14 +250,14 @@ def exp_plot(x, y, columns, values, op, scale, axis, buffer_val, fnct):
     fnct("")
 
 
-def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", plot_res=False):
+def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", source="Library", plot_res=False):
     """Creates and writes data to export file. 
     Export file includes: result set table, statistics table, and four different graphs."""
     ROUND = remainder
     NVALID = nvalid
     
-    expfile = open(PATH + strftime("%d-%m-%Y") + " Library Report.txt", "w+")
-    expfile.write(strftime("%d/%m/%Y %H:%M:%S") + "\n\nHost Table: " + tb + "\nArguments:  " + args + "\n\nResults Set\n")
+    expfile = open(PATH + strftime("%m-%d-%Y") + " " + source + " Report.txt", "w+")
+    expfile.write(strftime("%m/%d/%Y %H:%M:%S") + "\n\nHost Table: " + tb + "\nArguments:  " + args + "\n\nResults Set\n")
     
     table(columns, values, point, buffer_val, lambda x: expfile.write(x + "\n"))
     
