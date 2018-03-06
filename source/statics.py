@@ -41,7 +41,7 @@ PARSE = {"remove": lambda h: "DELETE FROM " + h}
 # flag and column pairs for all columns throughout the DB
 FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-y": "Year", "-p": "Pages", "-f": "Format", "-F": "Finished", 
-         "-c": "Collection", "-Q": "Quote", "-d": "Day", "-o": "Operation",
+         "-c": "Collection", "-q": "Quote", "-d": "Day", "-o": "Operation",
          "-h": "Host", "-u": "User", "-A": "Arguments", "-P": "Priority",
          "-m": "Month", "-D": "Date", "-w": "Weekday"}
         
