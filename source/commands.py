@@ -41,7 +41,7 @@ def script(inpt, info):
             
             for var in var_dict:
                 cmd = cmd.replace(var, var_dict[var])
-                
+
             if cmd != "":
                 query.run_command(cmd, info)
 

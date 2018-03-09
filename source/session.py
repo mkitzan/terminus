@@ -12,7 +12,7 @@ from shutil import get_terminal_size
 
 def create_record(inpt, info):
     """Creates and submits a record of a user inputted command."""
-    sql_query = "INSERT INTO records VALUES('" + strftime("%d/%m/%Y %H:%M:%S") + "', '" + info[2] + "', '" + \
+    sql_query = "INSERT INTO records VALUES('" + strftime("%m/%d/%Y %H:%M:%S") + "', '" + info[2] + "', '" + \
                 inpt[0] + "', '" + info[1] + "', '" + " ".join(inpt[1:]) + "')"
     query.execute_sql(info[0], sql_query)
     info[0].commit()

@@ -26,7 +26,7 @@ PLOT_OPS = {"count": lambda arr: len(set(arr)),
             "sum": lambda arr: sum(arr),
             "avg": lambda arr: sum(arr) / len(arr)}
             
-
+            
 def set_max_y(res, flg, max_y):
     """Tests/sets max length of y-axis values."""
     test = res[-1][1 if flg == "y" else 0]
@@ -94,16 +94,22 @@ def plot(columns, results, op, scale, flg, point="*", buffer_val=0, funct=print)
     max_x = -1
     max_y = -1
     num = False
+    date = False
     
     try:
         curr = int(results[0][0])
         num = True
     except ValueError:
+        if "/" in results[0][0]:
+            date = True
         curr = results[0][0]
     
     # performs sum, count, or avg function for each distinct record value as a key
     for el in results:
         if el[0] != curr:
+            if date:
+                curr = " ".join([ch for ch in curr])
+                
             res += [[str(curr) if num else "".join([word[0] for word in curr.split(" ")]), round(PLOT_OPS[op](temp) / scale)]]    
             max_y = set_max_y(res, flg, max_y)
             max_x = set_max_x(res, flg, max_x)
@@ -112,13 +118,15 @@ def plot(columns, results, op, scale, flg, point="*", buffer_val=0, funct=print)
             temp = []
         temp += [el[-1]]
     
+    if date:
+        curr = " ".join([ch for ch in curr])
     res += [[str(curr) if num else "".join([word[0] for word in curr.split(" ")]), round(PLOT_OPS[op](temp) / scale)]]
     max_y = set_max_y(res, flg, max_y)
     max_x = set_max_x(res, flg, max_x)
     
     if funct == print:
         print()
-
+        
     if flg == "x":
         plot_aggregate_x(columns, res, max_y, max_x, buffer_val, point, scale, op, funct)
         

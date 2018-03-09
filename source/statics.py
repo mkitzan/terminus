@@ -30,7 +30,7 @@ CMD_ERROR = "\n        Invalid command"
 SCRIPT_ERROR = "\nScript must be a '.trm' file"
 EXCEPT = "\nTry: help "
 
-# logic ops available in queries val0 = back-index to cut list by, val1 SQL argument
+# logic ops available in queries val0 = back-index to cut list by, val1 = SQL argument
 LOGIC_OPS = {"v": [-1, "' OR "], "^": [-1, "' AND "], "!": [-3, " NOT "]}
 
 # names of tables not allowed to be accessed
@@ -54,7 +54,7 @@ HOST_SET = {"books": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Form
             "quotes": ["Title", "Author", "Year", "Quote"],
             "wishlist": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Priority"],
             "records": ["Date", "User", "Operation", "Host", "Arguments"],
-            "tracker": ["Weekday", "Month", "Day", "Year", "Title", "Pages"]}
+            "tracker": ["Weekday", "Month", "Day", "Year", "Date", "Title", "Pages"]}
 
 # help text for each flag/column
 FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
@@ -70,7 +70,7 @@ FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
              "Day": "        -d or --day         flag specifies the day numerial",
              "Weekday": "        -w or --weekday     flag specifies the weekday name (abbreviated)",
              "Quote": "        -q or --quote       flag specifies a book quote",
-             "Date": "        -D or --date        flag specifies the date in day/mon/year hr:mn:sc",
+             "Date": "        -D or --date        flag specifies the date in mon/day/year",
              "User": "        -u or --user        flag specifies the user",
              "Operation": "        -o or --operation   flag specifies the operation used",
              "Host": "        -h or --host        flag specifies the host",
@@ -118,7 +118,7 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         Expected column ordering by host table:
             books:      -t, -a, -g, -y, -p, -T, -f, -F
             stories:    -t, -a, -g, -y, -p, -c, -F
-            tracker:    -w, -m, -d, -y, -t, -p
+            tracker:    -w, -m, -d, -y, -D, -t, -p
             quotes:     -t, -a, -y, -q
             records:    -D, -u, -o, -h, -A
             wishlist:   -t, -a, -g, -y, -p, -T, -P
