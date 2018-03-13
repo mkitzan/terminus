@@ -5,7 +5,7 @@ Flags are finally supported rather than weird file path syntax: python was chose
 The previous versions had, to varying degrees of severity, command syntax dissonance, where no truly uniform syntax existed. 
 The input syntax has now been unified under the comfortable, user friendly, flag style. 
 Unlike the previous versions, Terminus was designed to be table, and column scalable. 
-In previous versions it would have been a nightmare to integrate new table into the system; however, now it's fairly straight forward. Implementing a new column or table involves adding values to datastructures in the the theme file ('statics.py'), and performing SQL operations to add the table or column.
+In previous versions it would have been a nightmare to integrate new table into the system; however, now it's fairly straight forward. Implementing a new column or table involves adding values to datastructures in the the theme file ('theme.py'), and performing SQL operations to add the table or column.
 
 # Features
 - 4 library host tables (books, stories, quotes, wishlist), and 2 administrative host table (tracker, records)
@@ -80,9 +80,9 @@ Look at the example script 'complete.trm' in the scripts folder.
 Must declare either 'search', 'stats', and 'tsv' as the first argument.
 
       user@host: sql search SELECT title, author, year FROM books UNION SELECT title, author, year FROM stories
-- tsv, allows user to export a query as a tsv file for use in other programs or applications.
+- export, allows user to export a query as a tsv file for use in other programs or applications.
 
-      user@host: tsv -F false -T not manga -T not art book
+      user@host: export -F false -T ! manga ^ ! art book
 - system, allows user to create new DB objects from within the program.
 Applicable DB objects include new tables, users, columns (for existing tables).
 
