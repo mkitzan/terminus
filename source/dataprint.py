@@ -4,12 +4,14 @@ from shutil import get_terminal_size
 from time import strftime
 from math import ceil
 
+# default parameters for tables and exports
 WINDOW = 180
 PATH = "reports/"
 NVALID = "-"
 MISSING = "Not Provided"
 ROUND = 4
 
+# statistic functions for the stats table
 SFUNCTS = {"Total": [0, lambda x: len(x)], 
            "Unique": [1, lambda x: len(set(x))],
            "Sum Total": [2, lambda x: sum(x)], 
@@ -22,6 +24,7 @@ SFUNCTS = {"Total": [0, lambda x: len(x)],
            "Standard Deviation": [9, lambda x: round(statistics.stdev(x), ROUND)], 
            "Variance": [10, lambda x: round(statistics.variance(x), ROUND)]}
 
+# aggregate functions to plot by
 PLOT_OPS = {"count": lambda arr: len(set(arr)),
             "sum": lambda arr: sum(arr),
             "avg": lambda arr: sum(arr) / len(arr)}

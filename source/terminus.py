@@ -1,22 +1,22 @@
 #!/usr/bin/python3
 import session
 import query
-import statics
+import theme
 
 
 def format_quote(quote):
     """Formats quotes which trail multiple lines by inserting newlines between words.
     Otherwise, lines will often be split mid word.""" 
-    barrier = statics.WIDTH - statics.BOUNDS
+    barrier = theme.WIDTH - theme.BOUNDS
     length = len(quote)
 
     while barrier < length:
-        for i in range(statics.BOUNDS):
+        for i in range(theme.BOUNDS):
             if barrier+i < len(quote) and quote[barrier+i] == " ":
                 quote = quote[:barrier+i] + "\n " + quote[barrier+i:]
                 break
 
-        barrier += statics.WIDTH - statics.BOUNDS
+        barrier += theme.WIDTH - theme.BOUNDS
 
     return quote
 
@@ -35,10 +35,10 @@ def random_quote(db):
 
 def home_screen(db):
     """Prints the start screen, and random quote."""
-    print(statics.TITLE)
+    print(theme.TITLE)
 
     random_quote(db)
-    input(statics.PAUSE)
+    input(theme.PAUSE)
     session.clear_screen()
 
 

@@ -1,13 +1,13 @@
-VERSION = "Terminus v2.6"
+VERSION = "Terminus v2.7"
 
-# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.7
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.8
 TITLE = """
-      _______                  _                         ___     __  
-     |__   __|                (_)                       |__ \   / /  
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) | / /_  
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // / | '_ \ 
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ | (_) |
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)___/
+      _______                  _                         ___   ______ 
+     |__   __|                (_)                       |__ \ |____  |
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) |    / / 
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /    / /  
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ / /   
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)_/  
      Terminal Library Database
     """
 
@@ -17,7 +17,7 @@ DEFAULT_HOST = "books"
 
 # terminal width
 WIDTH = 130
-# length of a line for quote ate title screen
+# length of a line for quote at title screen
 BOUNDS = 90
 # length of progress bar in upload command
 PROGRESS = 35
@@ -36,6 +36,7 @@ LOGIC_OPS = {"v": [-1, "' OR "], "^": [-1, "' AND "], "!": [-3, " NOT "]}
 # names of tables not allowed to be accessed
 BLOCKED = ["sqlite_master", "credentials"]
 
+# special case operator when parsing arg flags to sql
 PARSE = {"remove": lambda h: "DELETE FROM " + h}
 
 # flag and column pairs for all columns throughout the DB
@@ -141,9 +142,9 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         
              
         Example: sql search SELECT Author, Year FROM books WHERE Year LIKE 19%%""",
-             "tsv": """        Exports a TSV file of a search query. Useful when using library data for other programs.
+             "export": """        Exports a TSV file of a search query. Useful when using Terminus data for other programs.
              
-        Example: tsv -F false""",
+        Example: export -F false""",
              "system": """        Allows user ability to add new users, tables, or columns from inside the program.
         System has acceptable arguments corresponding to the new DB object to create: user, table, column.
         Multiple arguments can be present: they will be evaluated in order.
@@ -153,9 +154,10 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         Script variables must be declared with the '-v' flag. The var name and value must be stated with an '=' and no spaces. 
         Where ever a variable name appears as a distinct token in the script with a '$' preceding it, it will be replaced by the value at run time.
         Each line in the script will be interpreted as a Terminus command: blank lines will be disregarded.
+        Users can access date related variables directly within a script: '$trm.weekday', '$trm.month', '$trm.day', '$trm.year', and '$trm.date'
         
-        Example: script -S complete.trm -v title=Sturgeon is Alive and Well...
-        Any appearances of '$book_title' would be replaced by 'Sturgeon is Alive and Well...'""",
+        Example: script -S progress.trm -v title=Sturgeon is Alive and Well... pages=53
+        Any appearances of '$title' would be replaced by 'Sturgeon is Alive and Well...', and '$pages' by '53'""",
              "exit": """        Exit takes no arguments. Used to safely leave the program.""",
              "help": """        Prints the general help page, and specific help pages for all the following arguments.
              
@@ -178,7 +180,7 @@ HELP_STANDARD = """
         change      allows host table and user change
         upload      allows for bulk 'insert' from CSV or TSV file
         sql         allows user to enter a raw SQL query
-        tsv         allows user to export data for use in other applications
+        export      allows user to export data as a TSV
         system      allows user to create new DB objects
         script      allows user to run a .trm script
         help        prints a general help page, and command specific help pages
@@ -195,7 +197,7 @@ HELP_STANDARD = """
             Matches all books in the DB not published in the 1900's
 
         OR:     By placing 'v' between two values following a flag, you can create queries which a value OR another.
-        
+
             Example: plot -X year -Y avg pages 100 -y 196? v 197?,
             Plots a graph of the average page count for books in the DB published between 1960 and 1979
             
@@ -268,7 +270,10 @@ CLOSE = "\nDatabase connection closed"
 CLEAR = "clear"
 TERMINAL_TITLE = "title " + VERSION
 
-OTHER_PART =  " in the DB\n\nTo finish the implementation of the table open 'statics.py' perform the following adjustments:\n"
+OTHER_PART =  " in the DB\n\nTo finish the implementation of the table open 'theme.py' perform the following adjustments:\n"
+
+# variables accessable from within terminus scripts
+SCRIPT_VARS = {"$trm.weekday": "", "$trm.month": "", "$trm.day": "", "$trm.year": "", "$trm.date": ""}
 
 
 # print functions which take some variable input
@@ -276,7 +281,7 @@ def ret_flag(inpt, i):
     return (inpt[i][1:3] if inpt[i] not in CAPS.keys() else CAPS[inpt[i]]) if len(inpt[i]) > 2 else inpt[i]
 
 
-# prints message about adjusting statics.py
+# prints message about adjusting theme.py
 def adjust(table, adj):
     return "The table '" + table + "' has been " + adj + OTHER_PART
 

@@ -1,6 +1,6 @@
 import session
 import query
-import statics
+import theme
 import dataprint
 
 from math import ceil
@@ -14,10 +14,22 @@ def script_vars(inpt):
     var = []
     
     for i in reversed(range(len(inpt))):
-        if inpt[i] == "-v" or inpt[i] == "--variable":
-            name = var.pop(0).split("=")
-            var_dict["$"+name[0]] = " ".join(name[1:] + var)
+        # sets values in var_dict when -v flag shows
+        if inpt[i] == "-v" or inpt[i] == "--variables":
+            vals = []
+            name = []
+            
+            for v in reversed(var):
+                if "=" in v:
+                    name = v.split("=")
+                    vals.insert(0, name[1])
+                    var_dict["$"+name[0]] = " ".join(vals)
+                    vals = []
+                else:
+                    vals.insert(0, v)
+                    
             var = []
+        # sets the file name of the script
         elif inpt[i] == "-S" or inpt[i] == "--script":
             infile = "scripts/" + " ".join(var)
             var = []
@@ -32,17 +44,22 @@ def script(inpt, info):
     infile, var_dict = script_vars(inpt)
     
     if infile[-4:] != ".trm":
-        input(statics.SCRIPT_ERROR)
+        input(theme.SCRIPT_ERROR)
         return
     
     with open(infile, "r") as script:
         for line in script:
             cmd = line.strip("\n")
             
+            # substitute user variables
             for var in var_dict:
                 cmd = cmd.replace(var, var_dict[var])
-
-            if cmd != "":
+            # substitute terminus variables
+            for var in theme.SCRIPT_VARS:
+                cmd = cmd.replace(var, theme.SCRIPT_VARS[var])
+            
+            # will toss out empty strings or comments
+            if cmd != "" or cmd[0] != "#":
                 query.run_command(cmd, info)
 
 
@@ -65,7 +82,7 @@ def fileout(columns, results, delim, host):
 def sql(inpt, info):
     """Runs a raw SQL query."""
     # checks if query is accessing a blocked table
-    if set(inpt).intersection(set(statics.BLOCKED)) is not {}:
+    if set(inpt).intersection(set(theme.BLOCKED)) is not {}:
         return
     
     command = inpt.pop(0)
@@ -80,7 +97,7 @@ def sql(inpt, info):
         fileout(columns, results, "\t", info[1])
         return
         
-    input(statics.PAUSE)
+    input(theme.PAUSE)
 
 
 def plot(inpt, info):
@@ -127,7 +144,7 @@ def plot(inpt, info):
     columns, results = query.execute_sql(info[0], sql_query)
     
     dataprint.plot(columns, results, spec_vars[2], spec_vars[1], spec_vars[3][1].lower(), buffer_val=(0 if spec_vars[3][1] == "X" else 1))
-    input(statics.PAUSE)
+    input(theme.PAUSE)
 
 
 def cmd_stats(inpt, info):
@@ -136,22 +153,22 @@ def cmd_stats(inpt, info):
 
     columns, results = query.execute_sql(info[0], sql_query)
     dataprint.stats(columns, results)
-    input(statics.PAUSE)
+    input(theme.PAUSE)
 
 
 def repackage(inpt, host):
     """Tosses out flags, and joins multi-word values together."""
-    cols = [-1] * len(statics.HOST_SET[host])
+    cols = [-1] * len(theme.HOST_SET[host])
     flag = 0
 
     for i in range(len(inpt)):
-        curr = statics.ret_flag(inpt, i) if "-" == inpt[i][0] else ""
+        curr = theme.ret_flag(inpt, i) if "-" == inpt[i][0] else ""
 
-        if curr in statics.FLAGS.keys():
-            cols[statics.HOST_SET[host].index(statics.FLAGS[statics.ret_flag(inpt, flag)])] = " ".join(inpt[flag+1:i])
+        if curr in theme.FLAGS.keys():
+            cols[theme.HOST_SET[host].index(theme.FLAGS[theme.ret_flag(inpt, flag)])] = " ".join(inpt[flag + 1:i])
             flag = i
 
-    cols[statics.HOST_SET[host].index(statics.FLAGS[statics.ret_flag(inpt, flag)])] = " ".join(inpt[flag+1:])
+    cols[theme.HOST_SET[host].index(theme.FLAGS[theme.ret_flag(inpt, flag)])] = " ".join(inpt[flag + 1:])
 
     return cols
     
@@ -161,7 +178,7 @@ def insert(inpt, info):
     inpt = repackage(inpt, info[1])
 
     sql_query = "INSERT INTO " + info[1] + \
-                "(" + ", ".join(statics.HOST_SET[info[1]]) + ") VALUES ('" + "', '".join(inpt) + "')"
+                "(" + ", ".join(theme.HOST_SET[info[1]]) + ") VALUES ('" + "', '".join(inpt) + "')"
 
     query.execute_sql(info[0], sql_query)
     info[0].commit()
@@ -206,17 +223,17 @@ def upload(inpt, info):
             
             # processes progress ratios
             ratio = curr / file_len
-            progress = ceil(ratio * statics.PROGRESS)
+            progress = ceil(ratio * theme.PROGRESS)
             ratio = ceil(ratio * 100)
             row = funct(row)
 
             # prints the progress bar
             session.clear_screen()
             print(info[2] + "@" + info[1] + ": " + "upload " + " ".join(inpt)) 
-            print("\n\n    |" + ("#" * progress) + (" " * (statics.PROGRESS - progress)) + "|  " + str(ratio) + "%")
+            print("\n\n    |" + ("#" * progress) + (" " * (theme.PROGRESS - progress)) + "|  " + str(ratio) + "%")
             print("\n    '" + row + "'")
             
-            sql_query = "INSERT INTO " + info[1] + "(" + ", ".join(statics.HOST_SET[info[1]]) + ")" \
+            sql_query = "INSERT INTO " + info[1] + "(" + ", ".join(theme.HOST_SET[info[1]]) + ")" \
                                                    " VALUES('" + row + "')"
 
             query.execute_sql(info[0], sql_query)
@@ -239,8 +256,8 @@ def find_change(inpt):
     change = inpt.pop(0).capitalize() + "='"
     
     for i in range(len(inpt)):
-        flg = statics.ret_flag(inpt, i) if "-" == inpt[i][0] else ""
-        if flg in statics.FLAGS:
+        flg = theme.ret_flag(inpt, i) if "-" == inpt[i][0] else ""
+        if flg in theme.FLAGS:
             change = change[:-1]
             break
         
@@ -281,7 +298,7 @@ def aggregate(agg, inpt, info):
 
     columns, results = query.execute_sql(info[0], sql_query)
     dataprint.table(columns, results)
-    input(statics.PAUSE)
+    input(theme.PAUSE)
     
     
 def report(inpt, info):
@@ -300,7 +317,7 @@ def search(inpt, info):
     columns, results = query.execute_sql(info[0], sql_query)
     dataprint.table(columns, results)
     
-    input(statics.PAUSE)
+    input(theme.PAUSE)
     
     
 def find_op(inpt):
@@ -347,7 +364,7 @@ def distinct(inpt, info):
     elif op == "search":
         dataprint.table(columns, results)
 
-    input(statics.PAUSE)
+    input(theme.PAUSE)
 
 
 def change(inpt, info):
@@ -359,7 +376,7 @@ def change(inpt, info):
             if session.change_host(info[0], inpt[i+1]):
                 info[1] = inpt[i+1]
             else:
-                input(statics.HOST_ERROR.strip("\n"))
+                input(theme.HOST_ERROR.strip("\n"))
                 return
                 
             i += 1
@@ -367,7 +384,7 @@ def change(inpt, info):
             if session.verify(info[0], inpt[i+1], inpt[i+2]):
                 info[2] = inpt[i+1]
             else:
-                input(statics.LOGIN_ERROR.strip("\n"))
+                input(theme.LOGIN_ERROR.strip("\n"))
                 return
                 
             i += 2
@@ -376,21 +393,21 @@ def change(inpt, info):
 def close_out(inpt, info):
     """Closes DB connection."""
     info[0].close()
-    print(statics.CLOSE)
+    print(theme.CLOSE)
 
 
 def cmd_help(inpt, info):
     """Prints the correctly formatted help page."""
     print()
-    print(statics.help1(info[1]))
+    print(theme.help1(info[1]))
 
-    for i in statics.HOST_SET[info[1]]:
-        print(statics.FLAG_HELP[i])
+    for i in theme.HOST_SET[info[1]]:
+        print(theme.FLAG_HELP[i])
 
-    print(statics.HELP_STANDARD)
+    print(theme.HELP_STANDARD)
 
     for el in inpt:
-        print(statics.help2(el))
-        print(statics.HELP_TEXT[el] if el in query.FUNCTIONS.keys() else statics.CMD_ERROR)
+        print(theme.help2(el))
+        print(theme.HELP_TEXT[el] if el in query.FUNCTIONS.keys() else theme.CMD_ERROR)
 
-    input(statics.PAUSE)
+    input(theme.PAUSE)

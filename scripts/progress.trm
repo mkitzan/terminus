@@ -1,0 +1,3 @@
+change -h tracker
+insert -w $trm.weekday -m $trm.month -d $trm.day -y $trm.year -D $trm.date -t $title -p $pages
+

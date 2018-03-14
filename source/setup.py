@@ -1,6 +1,6 @@
 import session
 import query
-import statics
+import theme
 
 from getpass import getpass
 
@@ -8,8 +8,8 @@ from getpass import getpass
 def help():
     """Prints set-up help text."""
     session.clear_screen()
-    print(statics.SETUP_HELP)
-    input(statics.PAUSE)
+    print(theme.SETUP_HELP)
+    input(theme.PAUSE)
 
 
 def close_out():
@@ -34,9 +34,9 @@ def table(operation, connection):
     
     while not_finished:
         session.clear_screen()
-        print(statics.TABLE)
-        table = input(statics.NEW_TABLE)
-        confirm = input(statics.CONFIRM_TABLE)
+        print(theme.TABLE)
+        table = input(theme.NEW_TABLE)
+        confirm = input(theme.CONFIRM_TABLE)
         
         not_finished = False if table == confirm else True
         
@@ -44,7 +44,7 @@ def table(operation, connection):
     
     while not_finished:
         session.clear_screen()
-        print(statics.COLUMN_TEXT)
+        print(theme.COLUMN_TEXT)
         
         column_space = []
         redo = False
@@ -52,12 +52,12 @@ def table(operation, connection):
         while not_finished: 
             col = []
             
-            for text in statics.COLUMN_GET:
+            for text in theme.COLUMN_GET:
                 col.append(input(text))
-                if col[-1] == statics.END:
+                if col[-1] == theme.END:
                     not_finished = False
                     break
-                elif col[-1] == statics.REDO:
+                elif col[-1] == theme.REDO:
                     redo = True
                     break
             
@@ -74,12 +74,12 @@ def table(operation, connection):
     
     if operation == "alter":
         alter_table(table, column_space, connection)    
-        print(statics.adjust(table, operation) + statics.EXPLAIN2)
+        print(theme.adjust(table, operation) + theme.EXPLAIN2)
     else:
         create_table(table, column_space[:-1], connection)
-        print(statics.adjust(table, operation) + statics.EXPLAIN1)
+        print(theme.adjust(table, operation) + theme.EXPLAIN1)
     
-    input(statics.PAUSE)
+    input(theme.PAUSE)
    
 
 def alter_table(table, columns, connection):
@@ -120,9 +120,9 @@ def get_user():
     
     while not_match:
         session.clear_screen()
-        user = input(statics.NEW_USER)
-        password = getpass(statics.NEW_PW)
-        confirm = getpass(statics.CONFIRM_PW)
+        user = input(theme.NEW_USER)
+        password = getpass(theme.NEW_PW)
+        confirm = getpass(theme.CONFIRM_PW)
     
         match = False if password == confirm else True
 
@@ -145,8 +145,8 @@ def get_command():
 
     while cont:
         session.clear_screen()
-        print(statics.VERSION + statics.SETUP_OPTIONS)
-        cmd = input(statics.CHEVRON)
+        print(theme.VERSION + theme.SETUP_OPTIONS)
+        cmd = input(theme.CHEVRON)
         print()
         cmd = "help" if cmd not in commands.keys() else cmd
         commands[cmd]()
@@ -157,14 +157,14 @@ def main():
     session.title()
     session.clear_screen()
     
-    print(statics.TITLE)
-    print(statics.SETUP_MSG)
-    input(statics.PAUSE)
+    print(theme.TITLE)
+    print(theme.SETUP_MSG)
+    input(theme.PAUSE)
     
     session.clear_screen()
     
-    print(statics.SQLITE3)
-    check = input(statics.HAS_SQLITE3)
+    print(theme.SQLITE3)
+    check = input(theme.HAS_SQLITE3)
 
     if check.lower() == "n":
         exit()

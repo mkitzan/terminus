@@ -1,6 +1,6 @@
 import session
 import commands
-import statics
+import theme
 import setup
 
 
@@ -13,7 +13,7 @@ FUNCTIONS = {"search": commands.search, "insert": commands.insert,
              "help": commands.cmd_help, "upload": commands.upload, 
              "stats": commands.cmd_stats, "report": commands.report, 
              "distinct": commands.distinct, "sql": commands.sql,
-             "tsv": commands.tsv, "system": setup.from_terminus,
+             "export": commands.tsv, "system": setup.from_terminus,
              "script": commands.script}
 
 
@@ -44,7 +44,7 @@ def sorting(args):
         end = 0
         
         for i in range(index + 1, len(args)):
-            if (args[i][1:3] if len(args[i]) > 2 else args[i]) not in statics.FLAGS.keys():
+            if (args[i][1:3] if len(args[i]) > 2 else args[i]) not in theme.FLAGS.keys():
                 sort += args[i] + ", "
                 end = i
             else:
@@ -63,21 +63,21 @@ def parse_flags(args):
 
     for i in range(len(args)):
         arg = str(args[i]).replace("*", "%").replace("?", "_")
-        curr = statics.ret_flag(args, i) if "-" == args[i][0] else ""
+        curr = theme.ret_flag(args, i) if "-" == args[i][0] else ""
         # arg[1:3] if len(arg) > 2 else arg
 
-        if curr in statics.FLAGS.keys():
-            where = where[:-1] + "') AND (" + statics.FLAGS[curr] + " LIKE '"
+        if curr in theme.FLAGS.keys():
+            where = where[:-1] + "') AND (" + theme.FLAGS[curr] + " LIKE '"
         # processes logical operations in flag args
-        elif arg in statics.LOGIC_OPS.keys():
-            arg = statics.LOGIC_OPS[arg]
+        elif arg in theme.LOGIC_OPS.keys():
+            arg = theme.LOGIC_OPS[arg]
             where = where.split(" ")
             flag = "Title"
             
             for el in reversed(where[:-1]):
                 el = el.strip("(")
 
-                if el in statics.FLAG_HELP.keys():
+                if el in theme.FLAG_HELP.keys():
                     flag = el
                     break
                     
@@ -92,7 +92,7 @@ def parse_sql(args, host, operation):
     """Concatenates the bits of the SQL query together."""
     where = parse_flags(args)
     
-    sql_query = statics.PARSE.setdefault(operation, lambda h: "SELECT " + ", ".join(statics.HOST_SET[h]) + " FROM " + h)(host)
+    sql_query = theme.PARSE.setdefault(operation, lambda h: "SELECT " + ", ".join(theme.HOST_SET[h]) + " FROM " + h)(host)
 
     return sql_query + " WHERE " + where
 
@@ -102,14 +102,14 @@ def run_command(command, info):
     command = command.split(" ")
     
     if command[0] not in FUNCTIONS.keys():
-        input(statics.funct_err(command[0]))
+        input(theme.funct_err(command[0]))
     else:
         try:
             session.create_record(command, info)
             FUNCTIONS[command[0]](command[1:], info)
         except Exception as e:
             # print error message
-            input(str(e) + statics.EXCEPT + (command[0] if command[0] != "help" else ""))
+            input(str(e) + theme.EXCEPT + (command[0] if command[0] != "help" else ""))
 
     return False if command[0] == "exit" else True
 

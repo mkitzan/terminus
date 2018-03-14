@@ -1,6 +1,8 @@
 change -h stories
 update finished TRUE -c $title
 report -F TRUE -s author collection year title
+
 change -h books
 update finished TRUE -t $title
 distinct title -C report -F TRUE -T ! manga ^ ! art book -s author year title
+

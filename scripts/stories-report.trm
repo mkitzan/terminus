@@ -1,0 +1,3 @@
+change -h stories
+report -F true -s author collection year title
+
