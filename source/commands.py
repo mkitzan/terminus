@@ -59,7 +59,7 @@ def script(inpt, info):
                 cmd = cmd.replace(var, theme.SCRIPT_VARS[var])
             
             # will toss out empty strings or comments
-            if cmd != "" or cmd[0] != "#":
+            if cmd != "" and cmd[0] != "#":
                 query.run_command(cmd, info)
 
 
