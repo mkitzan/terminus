@@ -1,4 +1,5 @@
 import statistics
+import theme
 
 from shutil import get_terminal_size
 from time import strftime
@@ -97,20 +98,21 @@ def plot(columns, results, op, scale, flg, point="*", buffer_val=0, funct=print)
     max_x = -1
     max_y = -1
     num = False
-    date = False
+    verbose = False
     
     try:
         curr = int(results[0][0])
         num = True
     except ValueError:
-        if "/" in results[0][0]:
-            date = True
+        if columns[0] in theme.VERBOSE:
+            verbose = True
+            
         curr = results[0][0]
     
     # performs sum, count, or avg function for each distinct record value as a key
     for el in results:
         if el[0] != curr:
-            if date:
+            if verbose:
                 curr = " ".join([ch for ch in curr])
                 
             res += [[str(curr) if num else "".join([word[0] for word in curr.split(" ")]), round(PLOT_OPS[op](temp) / scale)]]    
@@ -121,11 +123,16 @@ def plot(columns, results, op, scale, flg, point="*", buffer_val=0, funct=print)
             temp = []
         temp += [el[-1]]
     
-    if date:
+    if verbose:
         curr = " ".join([ch for ch in curr])
+        
     res += [[str(curr) if num else "".join([word[0] for word in curr.split(" ")]), round(PLOT_OPS[op](temp) / scale)]]
     max_y = set_max_y(res, flg, max_y)
     max_x = set_max_x(res, flg, max_x)
+    
+    if columns[0] in theme.SPEC_SORT:
+        sortby = theme.SPEC_SORT[columns[0]]
+        res.sort(key=lambda item: sortby.index(item[0]))
     
     if funct == print:
         print()
@@ -261,31 +268,29 @@ def exp_plot(x, y, columns, values, op, scale, axis, buffer_val, fnct):
     fnct("")
 
 
-def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", source="Library", plot_res=False):
+def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", source=theme.SOURCE):
     """Creates and writes data to export file. 
     Export file includes: result set table, statistics table, and four different graphs."""
     ROUND = remainder
     NVALID = nvalid
     
     expfile = open(PATH + strftime("%m-%d-%Y") + " " + source + " Report.txt", "w+")
-    expfile.write(strftime("%m/%d/%Y %H:%M:%S") + "\n\nHost Table: " + tb + "\nArguments:  " + args + "\n\nResults Set\n")
-    
+    expfile.write(strftime(theme.DATE_TIME + "%H:%M:%S") + "\n\nHost Table: " + tb + "\nArguments:  " + args + "\n\nResults Set\n")    
     table(columns, values, point, buffer_val, lambda x: expfile.write(x + "\n"))
     
     expfile.write("\nResults Statistics\n")
     stats(columns, values, point, buffer_val, remainder, nvalid, lambda x: expfile.write(x + "\n"))
     
-    if plot_res:
+    if theme.REPORTS[source] != []:
         # transpose graph correctly, change 'y' -> 'x', and buffer_val=0
-        expfile.write("\nResults Graphs: Author\n")
         values = [list(el) for el in zip(*values)]
+        expfile.write("\n")
 
-        exp_plot("Author", "Title", columns, values, "count", 1, "y", 1, lambda x: expfile.write(x + "\n"))
-        exp_plot("Author", "Pages", columns, values, "sum", 100, "y", 1, lambda x: expfile.write(x + "\n"))
-        
-        expfile.write("Results Graphs: Year\n")
-        
-        exp_plot("Year", "Title", columns, values, "count", 1, "y", 1, lambda x: expfile.write(x + "\n"))
-        exp_plot("Year", "Pages", columns, values, "sum", 100, "y", 1, lambda x: expfile.write(x + "\n"))
+        # plot / write the pre-set report graphs from within the theme file
+        for group in theme.REPORTS[source]:
+            expfile.write(group[0])
+
+            for graph in group[1:]:
+                exp_plot(graph[0], graph[1], columns, values, graph[2], graph[3], graph[4], graph[5], lambda x: expfile.write(x + "\n"))
         
     expfile.close()

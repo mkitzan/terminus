@@ -1,3 +1,5 @@
+# *** TITLE VERSION ***
+
 VERSION = "Terminus v2.7"
 
 # font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.8
@@ -14,6 +16,10 @@ TITLE = """
 # name of database to connect to
 DB = "database/library.db"
 DEFAULT_HOST = "books"
+DATE_TIME = "%m/%d/%Y"
+
+
+# *** WINDOW INFORMATION ***
 
 # terminal width
 WIDTH = 130
@@ -22,19 +28,56 @@ BOUNDS = 90
 # length of progress bar in upload command
 PROGRESS = 35
 
+
+# *** TERMINAL TITLE ***
+
+# default session variables for clearing the terminal, and setting the terminal window title
+CLEAR = "clear"
+TERMINAL_TITLE1 = "title "
+TERMINAL_TITLE2 = ""
+TITLE_SEPARATOR = " - "
+
+
+# *** ERROR TEXT ***
+
 # error and pause text
-PAUSE = "\nPress enter to continue..."
+CLOSE = "\nDatabase connection closed"
 HOST_ERROR = "\nInvalid host input"
 LOGIN_ERROR = "\nInvalid login credentials"
 CMD_ERROR = "\n        Invalid command"
 SCRIPT_ERROR = "\nScript must be a '.trm' file"
 EXCEPT = "\nTry: help "
 
+
+# *** TEXT PROMPTS ***
+
+# input prompt text
+PAUSE = "\nPress enter to continue..."
+
+GET_USER = "Username: "
+GET_PW = "Password: "
+GET_HOST = "    Host: "
+
+NEW_USER = "Enter new username: "
+NEW_PW = "Enter new password: "
+CONFIRM_PW = "Confirm new password: "
+
+TABLE = "Table"
+NEW_TABLE = "Enter table name:    "
+CONFIRM_TABLE = "Confirm table name:  "
+
+
+# *** OPERATION, FLAG, AND TABLE INFORMATION ***
+
 # logic ops available in queries val0 = back-index to cut list by, val1 = SQL argument
 LOGIC_OPS = {"v": [-1, "' OR "], "^": [-1, "' AND "], "!": [-3, " NOT "]}
 
-# names of tables not allowed to be accessed
-BLOCKED = ["sqlite_master", "credentials"]
+# verbose axis label in plot command
+VERBOSE = ["Date", "Weekday", "Month", "Operation"]
+
+# data for columns with special sorting requirements
+SPEC_SORT = {"Weekday": ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
+             "Month": ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"]}
 
 # special case operator when parsing arg flags to sql
 PARSE = {"remove": lambda h: "DELETE FROM " + h}
@@ -49,6 +92,9 @@ FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
 # all flags with capital short flags
 CAPS = {"--type": "-T", "--finished": "-F", "--arguments": "-A", "--priority": "-P", "--date": "-D"}
 
+# names of tables not allowed to be accessed
+BLOCKED = ["sqlite_master", "credentials"]
+
 # list of columns for each table (in order)
 HOST_SET = {"books": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Format", "Finished"],
             "stories": ["Title", "Author", "Genre", "Year", "Pages", "Collection", "Finished"],
@@ -56,6 +102,11 @@ HOST_SET = {"books": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Form
             "wishlist": ["Title", "Author", "Genre", "Year", "Pages", "Type", "Priority"],
             "records": ["Date", "User", "Operation", "Host", "Arguments"],
             "tracker": ["Weekday", "Month", "Day", "Year", "Date", "Title", "Pages"]}
+
+
+# *** HELP TEXT ***
+
+TABLE_HEADER = "\n    Other Host Tables:"
 
 # help text for each flag/column
 FLAG_HELP = {"Title": "        -t or --title       flag specifies the title",
@@ -206,6 +257,39 @@ HELP_STANDARD = """
             Example: stats -y ! 196? ^ 19?? -g science fiction
             Matches all sci-fi books published in the 1900's but not in 1960's"""
 
+
+# *** REPORT COMMAND ***
+
+# default value for dataprint.export source parameter
+SOURCE = "Library"
+
+# report graph's header prefix
+GRAPH_HEADER = "Results Graph(s): "
+
+# graph plotting parameters for the different table's reports
+# host table name: [[group header title, [x-axis col label, y-axis col label, agg-function, agg-scale, agg-axis, buffer value], ... ], ... ]
+REPORTS = {SOURCE: [],
+           
+           "Books": [[GRAPH_HEADER+"Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
+                     [GRAPH_HEADER+"Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
+                    
+           "Stories": [[GRAPH_HEADER+"Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
+                       [GRAPH_HEADER+"Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
+                      
+           "Wishlist": [[GRAPH_HEADER+"Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
+                        [GRAPH_HEADER+"Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
+                       
+           "Tracker": [[GRAPH_HEADER+"Date\n", ["Date", "Pages", "sum", 10, "y", 1]],
+                       [GRAPH_HEADER+"Weekday\n", ["Weekday", "Pages", "avg", 10, "y", 1]],
+                       [GRAPH_HEADER+"Title\n", ["Title", "Date", "count", 1, "y", 1]]],
+                      
+           "Quotes": [],
+           
+           "Records": []}
+
+
+# *** SET-UP SOURCE FILE ***
+
 # user selection menu text for set-up.py
 SETUP_OPTIONS = """ Set-up Options
         
@@ -227,19 +311,6 @@ You can download the latest version at 'https://www.sqlite.org/download.html'
           """
 HAS_SQLITE3 = "Do you have SQLite3 installed on this machine? [Y/n]: "
 
-# input prompt text
-GET_USER = "Username: "
-GET_PW = "Password: "
-GET_HOST = "    Host: "
-
-NEW_USER = "Enter new username: "
-NEW_PW = "Enter new password: "
-CONFIRM_PW = "Confirm new password: "
-
-TABLE = "Table"
-NEW_TABLE = "Enter table name:    "
-CONFIRM_TABLE = "Confirm table name:  "
-
 END = "end"
 REDO = "redo"
 
@@ -252,28 +323,38 @@ COLUMN_GET = ["Enter column name:   ",
 # input line indicator for user input without preceding text in set-up.py               
 CHEVRON = ">>> "
 
-EXPLAIN1 = """    If new column labels were used that do not exist in statics.FLAGS, add the columns and flag as a key (flag): value (label) pair
-    Add to statics.HOST_SET the table name and column list (in order you want them to appear in), as a key (table name): value (column list) pair
-    Add to statics.FLAG_HELP the flag name (column label) and help text for that flag, for any new flags created
-    Update the statics.HELP_TEXT for 'upload' by appending the table name and column/flag ordering"""
+EXPLAIN1 = """    If new column labels were used that do not exist in theme.FLAGS, add the columns and flag as a key (flag): value (label) pair
+    Add to theme.HOST_SET the table name and column list (in order you want them to appear in), as a key (table name): value (column list) pair
+    Add to theme.FLAG_HELP the flag name (column label) and help text for that flag, for any new flags created
+    Update the theme.HELP_TEXT for 'upload' by appending the table name and column/flag ordering"""
     
 EXPLAIN2 = """    Add the columns and flag as a key (flag): value (label) pair if column labels did not previously exist
-    Add to statics.HOST_SET the new column to the altered table's list
-    Add to statics.FLAG_HELP the flag name (column label) and help text for that flag
-    Update the statics.HELP_TEXT for 'upload' by appending column/flag ordering to the altered table
+    Add to theme.HOST_SET the new column to the altered table's list
+    Add to theme.FLAG_HELP the flag name (column label) and help text for that flag
+    Update the theme.HELP_TEXT for 'upload' by appending column/flag ordering to the altered table
     """
 
 SETUP_MSG = "     System Set-Up"
-CLOSE = "\nDatabase connection closed"
-
-# default session variables for clearing the terminal, and setting the terminal window title
-CLEAR = "clear"
-TERMINAL_TITLE = "title " + VERSION
 
 OTHER_PART =  " in the DB\n\nTo finish the implementation of the table open 'theme.py' perform the following adjustments:\n"
 
+
+# *** SCRIPT COMMAND ***
+
 # variables accessable from within terminus scripts
 SCRIPT_VARS = {"$trm.weekday": "", "$trm.month": "", "$trm.day": "", "$trm.year": "", "$trm.date": ""}
+
+
+# *** THEMEATIC FUNCTIONS ***
+
+# used for formatting the os.system call argument to change the terminal title
+def terminal_title(title):
+    return TERMINAL_TITLE1 + title + TERMINAL_TITLE2
+    
+
+# returns the formatted line for the other host tables section of the help page
+def other_tables(table):
+    return "        " + table + ": " + ", ".join(HOST_SET[table])
 
 
 # print functions which take some variable input
@@ -291,8 +372,46 @@ def funct_err(cmd): return "\nInvalid function '" + cmd + "': enter 'help' for m
 
 
 # prints the first line of the help command's output
-def help1(info): return "    " + VERSION + " '" + info + "' supported flags: "
+def help1(info): return "\n    " + VERSION + " '" + info + "' supported flags: "
 
 
 # prints the header for command specific help section
 def help2(inpt): return "\n    Command help '" + inpt + "': "
+
+
+# this function is called at the start of the program after theme.TITLE has been printed
+#       can be customized to anything, or just 'pass' if no special function is desired
+def on_start(db):
+    """Performs a customizable function at the start screen."""
+    random_quote(db)
+    
+
+# prints a random quote formatted to the screen
+def random_quote(db):
+    """Randomly selects/prints one quote from the quotes table."""
+    quote = db.cursor()
+    quote.execute("SELECT * FROM quotes ORDER BY RANDOM() LIMIT 1")
+    row = quote.fetchone()
+    
+    if row is not None:
+        print("\n \"" + format_quote(row[3]) + "\"\n\n\t-" + row[1] + "\n\t " + row[0] + ", " + str(row[2]))
+    
+    quote.close()
+    
+
+def format_quote(quote):
+    """Formats quotes which trail multiple lines by inserting newlines between words.
+    Otherwise, lines will often be split mid word.""" 
+    barrier = WIDTH - BOUNDS
+    length = len(quote)
+
+    while barrier < length:
+        for i in range(BOUNDS):
+            if barrier+i < len(quote) and quote[barrier+i] == " ":
+                quote = quote[:barrier+i] + "\n " + quote[barrier+i:]
+                break
+
+        barrier += WIDTH - BOUNDS
+
+    return quote
+    

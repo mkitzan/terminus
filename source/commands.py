@@ -307,7 +307,7 @@ def report(inpt, info):
     sql_query = query.parse_sql(inpt, info[1], "search")
 
     columns, results = query.execute_sql(info[0], sql_query)
-    dataprint.export(columns, results, tb=info[1], args="report " + " ".join(args), source=info[1].capitalize(), plot_res=True)
+    dataprint.export(columns, results, tb=info[1], args="report " + " ".join(args), source=info[1].capitalize())
 
 
 def search(inpt, info):
@@ -356,7 +356,7 @@ def distinct(inpt, info):
     if op == "stats":
         dataprint.stats(columns, results)
     elif op == "report":
-        dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt), source=info[1].capitalize(), plot_res=True)
+        dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt), source=info[1].capitalize())
         return
     elif op == "tsv":
         fileout(columns, results, "\t", info[1])
@@ -373,8 +373,11 @@ def change(inpt, info):
 
     for i in range(length):
         if (inpt[i] == "-h" or inpt[i] == "--host") and i+1 < length:
+            inpt[i+1] = inpt[i+1].lower()
+            
             if session.change_host(info[0], inpt[i+1]):
                 info[1] = inpt[i+1]
+                session.title(info[1])
             else:
                 input(theme.HOST_ERROR.strip("\n"))
                 return
@@ -398,14 +401,22 @@ def close_out(inpt, info):
 
 def cmd_help(inpt, info):
     """Prints the correctly formatted help page."""
-    print()
+    # current table's flags / columns
     print(theme.help1(info[1]))
-
+    
     for i in theme.HOST_SET[info[1]]:
         print(theme.FLAG_HELP[i])
+   
+    # other tables and their columns        
+    print(theme.TABLE_HEADER)
+   
+    for table in sorted(list(set(theme.HOST_SET)-set([info[1]]))):
+        print(theme.other_tables(table))
 
+    # standard help text
     print(theme.HELP_STANDARD)
 
+    # input specific help pages
     for el in inpt:
         print(theme.help2(el))
         print(theme.HELP_TEXT[el] if el in query.FUNCTIONS.keys() else theme.CMD_ERROR)

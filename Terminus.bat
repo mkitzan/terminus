@@ -1,2 +1,4 @@
 @echo off
-python source/terminus.py
+D:
+cd Terminus
+python source\session.py

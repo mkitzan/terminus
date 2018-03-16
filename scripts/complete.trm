@@ -1,3 +1,6 @@
+change -h tracker
+report -t $title
+
 change -h stories
 update finished TRUE -c $title
 report -F TRUE -s author collection year title

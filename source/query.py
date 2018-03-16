@@ -100,6 +100,7 @@ def parse_sql(args, host, operation):
 def run_command(command, info):
     """Runs through the function dictionary, and calls the correct command with the user's input."""
     command = command.split(" ")
+    command[0] = command[0].lower()
     
     if command[0] not in FUNCTIONS.keys():
         input(theme.funct_err(command[0]))
