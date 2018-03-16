@@ -281,6 +281,7 @@ REPORTS = {SOURCE: [],
                        
            "Tracker": [[GRAPH_HEADER+"Date\n", ["Date", "Pages", "sum", 10, "y", 1]],
                        [GRAPH_HEADER+"Weekday\n", ["Weekday", "Pages", "avg", 10, "y", 1]],
+                       [GRAPH_HEADER+"Month\n", ["Month", "Title", "count", 1, "y", 1], ["Month", "Pages", "sum", 100 , "y", 1]],
                        [GRAPH_HEADER+"Title\n", ["Title", "Date", "count", 1, "y", 1]]],
                       
            "Quotes": [],
