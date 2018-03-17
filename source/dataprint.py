@@ -5,6 +5,7 @@ from shutil import get_terminal_size
 from time import strftime
 from math import ceil
 
+
 # default parameters for tables and exports
 WINDOW = 180
 PATH = "reports/"
@@ -275,10 +276,10 @@ def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, r
     NVALID = nvalid
     
     expfile = open(PATH + strftime("%m-%d-%Y") + " " + source + " Report.txt", "w+")
-    expfile.write(strftime(theme.DATE_TIME + "%H:%M:%S") + "\n\nHost Table: " + tb + "\nArguments:  " + args + "\n\nResults Set\n")    
+    expfile.write(strftime(theme.DATE_TIME + " %H:%M:%S") + theme.LABEL_TB + tb + theme.LABEL_ARGS + args + theme.LABEL_RSET)    
     table(columns, values, point, buffer_val, lambda x: expfile.write(x + "\n"))
     
-    expfile.write("\nResults Statistics\n")
+    expfile.write(theme.LABEL_RSTATS)
     stats(columns, values, point, buffer_val, remainder, nvalid, lambda x: expfile.write(x + "\n"))
     
     if theme.REPORTS[source] != []:

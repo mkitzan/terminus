@@ -260,6 +260,12 @@ HELP_STANDARD = """
 
 # *** REPORT COMMAND ***
 
+# labels for source table, args, results set, results stats in report
+LABEL_TB = "\n\nHost Table: "
+LABEL_ARGS = "\nArguments:  "
+LABEL_RSET = "\n\nResults Set\n"
+LABEL_RSTATS = "\nResults Statistics\n"
+
 # default value for dataprint.export source parameter
 SOURCE = "Library"
 
