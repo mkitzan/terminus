@@ -20,12 +20,24 @@ def close_out():
 
 def new_table(connection=None):
     """Helper function for table, passes 'create'."""
-    table("create", connection if connection is not None else session.get_connection())
+    arg = True if connection is None else False
+    connection = connection if connection is not None else session.get_connection()
+    
+    table("create", connection)
+    
+    if arg:
+        connection.close()
     
     
 def new_column(connection=None):
     """Helper function for table, passes 'alter'"""
-    table("alter", connection if connection is not None else session.get_connection())
+    arg = True if connection is None else False
+    connection = connection if connection is not None else session.get_connection()
+    
+    table("alter", connection)
+    
+    if arg:
+        connection.close()
 
     
 def table(operation, connection):
@@ -85,33 +97,34 @@ def table(operation, connection):
 def alter_table(table, columns, connection):
     """Creates SQL statement, and runs ALTER TABLE statement."""
     sql_statement = "ALTER TABLE " + table + " ADD COLUMN " + " ".join(columns[0]) + "\n"
-    input(sql_statement)
     query.execute_sql(connection, sql_statement)
     connection.commit()
-    connection.close()
 
    
 def create_table(table, columns, connection):
     """Creates SQL statement, and runs CREATE TABLE statement."""
     sql_statement = "CREATE TABLE IF NOT EXISTS " + table + " (\n" + ",\n".join([" ".join(col) for col in columns]) + "\n)"
-    input(sql_statement)
     query.execute_sql(connection, sql_statement)
     connection.commit()
-    connection.close()
 
 
 def new_user(connection=None):
     """Helper function which calls the user input function for the new user."""
+    arg = True if connection is None else False
+    connection = connection if connection is not None else session.get_connection()
+    
     user, password = get_user()
-    create_user([user, password], connection if connection is not None else session.get_connection())
-
+    create_user([user, password], connection)
+    
+    if arg:
+        connection.close()
+        
 
 def create_user(inpt, connection):
     """Creates the new user in the DB."""
     sql_statement = "INSERT INTO credentials VALUES('" + session.hash_credentials(inpt[0], inpt[1]) + "')"
     query.execute_sql(connection, sql_statement)
     connection.commit()
-    connection.close()
 
 
 def get_user():
@@ -131,11 +144,11 @@ def get_user():
     
 def from_terminus(inpt, info):
     """Function the terminus core program uses to interface with set-up."""
-    commands = {"user": new_user(), "table": new_table(), "column": new_column()}
+    commands = {"user": new_user, "table": new_table, "column": new_column}
     
     for el in inpt:
         session.clear_screen()
-        commands[el](info[0])
+        commands[el](connection=info[0])
     
 
 def get_command():

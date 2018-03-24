@@ -1,5 +1,8 @@
+change -h tracker
+report -D *
+
 change -h stories
-report -F true -s author collection year title
+report -F TRUE -s author collection year title
 
 change -h books
 distinct title -C report -F TRUE -T ! manga ^ ! art book -s author year title
