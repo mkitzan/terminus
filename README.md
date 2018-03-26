@@ -8,12 +8,12 @@ Unlike the previous versions, Terminus was designed to be table, and column scal
 In previous versions it would have been a nightmare to integrate new table into the system; however, now it's fairly straight forward. Implementing a new column or table involves adding values to datastructures in the the theme file ('theme.py'), and performing SQL operations to add the table or column.
 
 # Features
-- 4 library host tables (books, stories, quotes, wishlist), and 2 administrative host table (tracker, records)
+- 4 library host tables (books, stories, quotes, wishlist), and 3 administrative host table (tracker, records, planner)
 - 19 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export, scripting...
 - User/password system
 - Full wildcard support
 - Case insensitive searching
-- 8 data points for 'books', 6 data points for 'stories', 4 data points for 'quotes', 7 data points for 'wishlist', 6 data points for 'tracker', and 5 data points for 'records'
+- 8 cols for 'books', 6 cols for 'stories', 4 cols for 'quotes', 7 cols for 'wishlist', 6 cols for 'tracker', 5 cols for 'planner', and 5 cols for 'records'
 - The Litany Against Fear
 
 # Initial Set-up
@@ -104,6 +104,8 @@ Applicable DB objects include new tables, users, columns (for existing tables).
 'wishlist' host table has 7 columns: title (-t), author (-a), genre (-g), year (-y), pages (-p), type (-T), priority (-P)
 
 'tracker' host table has 6 columns: weekday (-w), month (-m), day (-d), year (-y), title (-t), pages (-p)
+
+'planner' host table has 5 columns: month (-m), year (-y), title (-t), author (-a), pages (-p)
 
 'records' host table has 5 columns: date (-D), user (-u), operation (-o), host (-h), arguments (-A)
 
