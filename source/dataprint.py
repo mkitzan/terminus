@@ -55,7 +55,7 @@ def set_max_x(res, flg, max_x):
 def plot_aggregate_x(columns, res, max_y, max_x, buffer_val, point, scale, op, funct):
     """Prints the graph for queries aggregated over the x-axis."""
     # graph legend
-    funct(" " * (max_y+1) + "X-axis: " + op + "(" + columns[1] + ")" + "   Scale: " + str(scale) + "   Y-axis: " + columns[0])
+    funct(" " * (max_y) + "X-axis: " + op + "(" + columns[1] + ")" + "   Scale: " + str(scale) + "   Y-axis: " + columns[0])
     
     # graph body
     for el in res:
@@ -72,7 +72,7 @@ def plot_aggregate_x(columns, res, max_y, max_x, buffer_val, point, scale, op, f
 def plot_aggregate_y(columns, res, max_y, max_x, buffer_val, point, scale, op, funct):
     """Prints the graph for queries aggregated over the y-axis."""
     # graph legend
-    funct(" " * (len(str(max_y+1))+1) + "X-axis: " + columns[0] + "   Y-axis: " + op + "(" + columns[1] + ")" + "   Scale: " + str(scale))
+    funct(" " * (len(str(max_y))+1) + "X-axis: " + columns[0] + "   Y-axis: " + op + "(" + columns[1] + ")" + "   Scale: " + str(scale))
 
     # creates a list of (value, 'buffer offset') pairs
     res = [[el[0],(max_y - el[1])] for el in res]
@@ -275,7 +275,7 @@ def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, r
     ROUND = remainder
     NVALID = nvalid
     
-    expfile = open(PATH + strftime("%m-%d-%Y") + " " + source + " Report.txt", "w+")
+    expfile = open(PATH + strftime("%m-%d-%Y") + " " + source + ".txt", "w+")
     expfile.write(strftime(theme.DATE_TIME + " %H:%M:%S") + theme.LABEL_TB + tb + theme.LABEL_ARGS + args + theme.LABEL_RSET)    
     table(columns, values, point, buffer_val, lambda x: expfile.write(x + "\n"))
     
@@ -289,7 +289,7 @@ def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, r
 
         # plot / write the pre-set report graphs from within the theme file
         for group in theme.REPORTS[source]:
-            expfile.write(group[0])
+            expfile.write(theme.GRAPH_HEADER+group[0])
 
             for graph in group[1:]:
                 exp_plot(graph[0], graph[1], columns, values, graph[2], graph[3], graph[4], graph[5], lambda x: expfile.write(x + "\n"))

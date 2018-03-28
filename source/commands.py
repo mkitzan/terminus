@@ -5,6 +5,7 @@ import dataprint
 
 from math import ceil
 from time import strftime
+from os import listdir
 
 
 def script_vars(inpt):
@@ -31,7 +32,7 @@ def script_vars(inpt):
             var = []
         # sets the file name of the script
         elif inpt[i] == "-S" or inpt[i] == "--script":
-            infile = "scripts/" + " ".join(var)
+            infile = " ".join(var)
             var = []
         else:
             var.insert(0, inpt[i])
@@ -43,24 +44,29 @@ def script(inpt, info):
     """Runs a custom Terminus script (.trm)."""
     infile, var_dict = script_vars(inpt)
     
-    if infile[-4:] != ".trm":
-        input(theme.SCRIPT_ERROR)
-        return
+    if infile.lower() in theme.LIST_FILES:
+        print()
+        fileview("./scripts/")
+        input(theme.PAUSE)
+    else:
+        if infile[-4:] != ".trm":
+            input(theme.SCRIPT_ERROR)
+            return
     
-    with open(infile, "r") as script:
-        for line in script:
-            cmd = line.strip("\n")
-            
-            # substitute user variables
-            for var in var_dict:
-                cmd = cmd.replace(var, var_dict[var])
-            # substitute terminus variables
-            for var in theme.SCRIPT_VARS:
-                cmd = cmd.replace(var, theme.SCRIPT_VARS[var])
-            
-            # will toss out empty strings or comments
-            if cmd != "" and cmd[0] != "#":
-                query.run_command(cmd, info)
+        with open("scripts/" + infile, "r") as script:
+            for line in script:
+                cmd = line.strip("\n")
+                
+                # substitute user variables
+                for var in var_dict:
+                    cmd = cmd.replace(var, var_dict[var])
+                # substitute terminus variables
+                for var in theme.SCRIPT_VARS:
+                    cmd = cmd.replace(var, theme.SCRIPT_VARS[var])
+                
+                # will toss out empty strings or comments
+                if cmd != "" and cmd[0] != "#":
+                    query.run_command(cmd, info)
 
 
 def tsv(inpt, info):
@@ -213,8 +219,8 @@ def upload(inpt, info):
     # sets the row processing function depending on file format
     funct = (lambda r: "', '".join(prepare_row(r))) if inpt[0][-3:] == "csv" else (lambda r: r.replace("\t", "', '"))
 
-    with open(inpt[0], "r") as file:
-        row = file.readline().strip("\n")
+    with open(inpt[0], "r") as infile:
+        row = infile.readline().strip("\n")
         curr = 1
         
         while row:
@@ -238,7 +244,7 @@ def upload(inpt, info):
 
             query.execute_sql(info[0], sql_query)
             curr += 1
-            row = file.readline().strip("\n")
+            row = infile.readline().strip("\n")
     
         info[0].commit()
 
@@ -301,13 +307,41 @@ def aggregate(agg, inpt, info):
     input(theme.PAUSE)
     
     
+def fileview(dir_path):
+    """Prints out the files in the passed directory."""
+    for fl in sorted(listdir(dir_path)):
+        print(fl)
+    
+    
 def report(inpt, info):
     """Performs a search with the input, then passes the results to dataprint's export to create a simply report."""
-    args = [el for el in inpt]
-    sql_query = query.parse_sql(inpt, info[1], "search")
+    view = -1
+    
+    if "-v" in inpt:
+        view = inpt.index("-v")+1
+    elif "--view" in inpt:
+        view = inpt.index("--view")+1
+        
+    if view != -1:
+        filename = " ".join(inpt[view:])
+        print()
+        
+        if filename.lower() in theme.LIST_FILES:
+            fileview("./reports/")
+        else: 
+            filename += ".txt" if filename[-4:] != ".txt" else ""
+            
+            with open("reports/"+filename.capitalize(), "r") as rep:
+                for line in rep:
+                    print(line, end="")
+                    
+        input(theme.PAUSE)
+    else:
+        args = [el for el in inpt]
+        sql_query = query.parse_sql(inpt, info[1], "search")
 
-    columns, results = query.execute_sql(info[0], sql_query)
-    dataprint.export(columns, results, tb=info[1], args="report " + " ".join(args), source=info[1].capitalize())
+        columns, results = query.execute_sql(info[0], sql_query)
+        dataprint.export(columns, results, tb=info[1], args="report " + " ".join(args), source=info[1].capitalize())
 
 
 def search(inpt, info):

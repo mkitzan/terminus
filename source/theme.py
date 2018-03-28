@@ -1,15 +1,15 @@
 # *** TITLE VERSION ***
 
-VERSION = "Terminus v2.7"
+VERSION = "Terminus v2.8"
 
-# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.8
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.9
 TITLE = """
-      _______                  _                         ___   ______ 
-     |__   __|                (_)                       |__ \ |____  |
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) |    / / 
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /    / /  
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ / /   
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)_/  
+      _______                  _                         ___    ___  
+     |__   __|                (_)                       |__ \  / _ \ 
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) || (_) |
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /  > _ < 
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ | (_) |
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)___/  
      Terminal Library Database
     """
 
@@ -52,7 +52,7 @@ EXCEPT = "\nTry: help "
 # *** TEXT PROMPTS ***
 
 # input prompt text
-PAUSE = "\nPress enter to continue..."
+PAUSE = "\nPress 'enter' to continue..."
 
 GET_USER = "Username: "
 GET_PW = "Password: "
@@ -68,6 +68,9 @@ CONFIRM_TABLE = "Confirm table name:  "
 
 
 # *** OPERATION, FLAG, AND TABLE INFORMATION ***
+
+# keywords to list files in directory for commands script and report
+LIST_FILES = ["list", "ls", "dir"]
 
 # logic ops available in queries val0 = back-index to cut list by, val1 = SQL argument
 LOGIC_OPS = {"v": [-1, "' OR "], "^": [-1, "' AND "], "!": [-3, " NOT "]}
@@ -88,6 +91,15 @@ FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          "-c": "Collection", "-q": "Quote", "-d": "Day", "-o": "Operation",
          "-h": "Host", "-u": "User", "-A": "Arguments", "-P": "Priority",
          "-m": "Month", "-D": "Date", "-w": "Weekday"}
+         
+# special command specific flags
+# -S script flag               script
+# -v variable and view flag    script, report
+# -h host flag                 change
+# -u user flag                 change
+# -X x-axis flag               plot
+# -Y y-axis flag               plot
+# -C command flag              distinct
         
 # all flags with capital short flags
 CAPS = {"--type": "-T", "--finished": "-F", "--arguments": "-A", "--priority": "-P", "--date": "-D"}
@@ -175,7 +187,7 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         Example: plot -X author -Y count title 1 -g science fiction -F true""",
              
              "upload": """        Upload takes no flag arguments, the file format must be a TSV or CSV with no column label row.
-        If an record in the upload file has a column value with a comma, insert that item individually.
+        If an record in the upload file has a column value with a comma, insert that item individually, or us a TSV.
         
         Expected column ordering by host table:
             books:      -t, -a, -g, -y, -p, -T, -f, -F
@@ -193,7 +205,8 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         Example: stats -g science fiction -y 19??""",
              
              "report": """        Creates a simple report from the output of both a 'search', 'stats', and 'plot' call. 
-        All arguments are processed as a 'search' command.
+        All arguments are processed as a 'search' command. To view a report, use the '-v' special flag followed by the file name of the report.
+        To see a list of all reports, follow the '-v' flag with 'list', 'ls', or 'dir'.
         
         Example: report -T stories -g science fiction -s author""",
              
@@ -223,6 +236,7 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         Script variables must be declared with the '-v' flag. The var name and value must be stated with an '=' and no spaces. 
         Where ever a variable name appears as a distinct token in the script with a '$' preceding it, it will be replaced by the value at run time.
         Each line in the script will be interpreted as a Terminus command: blank lines will be disregarded.
+        To view a list of scripts available, follow the '-S' flag with either 'list', 'ls', or 'dir'.
         Users can access date related variables directly within a script: '$trm.weekday', '$trm.month', '$trm.day', '$trm.year', and '$trm.date'
         
         Example: script -S progress.trm -v title=Sturgeon is Alive and Well... pages=53
@@ -296,23 +310,22 @@ GRAPH_HEADER = "Results Graph(s): "
 # host table name: [[group header title, [x-axis col label, y-axis col label, agg-function, agg-scale, agg-axis, buffer value], ... ], ... ]
 REPORTS = {SOURCE: [],
            
-           "Books": [[GRAPH_HEADER+"Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
-                     [GRAPH_HEADER+"Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
+           "Books": [["Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
+                     ["Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
                     
-           "Stories": [[GRAPH_HEADER+"Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
-                       [GRAPH_HEADER+"Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
+           "Stories": [["Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
+                       ["Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
                       
-           "Wishlist": [[GRAPH_HEADER+"Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
-                        [GRAPH_HEADER+"Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
+           "Wishlist": [["Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
+                        ["Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
                        
-           "Tracker": [[GRAPH_HEADER+"Date\n", ["Date", "Pages", "sum", 10, "y", 1]],
-                       [GRAPH_HEADER+"Weekday\n", ["Weekday", "Pages", "avg", 10, "y", 1]],
-                       [GRAPH_HEADER+"Month\n", ["Month", "Title", "count", 1, "y", 1], ["Month", "Pages", "sum", 100 , "y", 1]],
-                       [GRAPH_HEADER+"Title\n", ["Title", "Date", "count", 1, "y", 1]]],
+           "Tracker": [["Date\n", ["Date", "Pages", "sum", 10, "y", 1]],
+                       ["Weekday\n", ["Weekday", "Pages", "avg", 10, "y", 1]],
+                       ["Month\n", ["Month", "Title", "count", 1, "y", 1], ["Month", "Pages", "sum", 100 , "y", 1]]],
                        
-           "Planner": [[GRAPH_HEADER+"Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
-                       [GRAPH_HEADER+"Month\n", ["Month", "Title", "count", 1, "y", 1], ["Month", "Pages", "sum", 100 , "y", 1]],
-                       [GRAPH_HEADER+"Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100 , "y", 1]]],
+           "Planner": [["Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
+                       ["Month\n", ["Month", "Title", "count", 1, "y", 1], ["Month", "Pages", "sum", 100 , "y", 1]],
+                       ["Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100 , "y", 1]]],
                       
            "Quotes": [],
            
@@ -347,9 +360,7 @@ REDO = "redo"
 
 COLUMN_TEXT = "Columns\nEnter '" + REDO + "' to restart inputting columns\nEnter '" + END + "' to finish inputting columns\n"
 
-COLUMN_GET = ["Enter column name:   ",
-              "Enter datatype:      ",
-              "Enter constraint:    "]
+COLUMN_GET = ["Enter column name:   ", "Enter datatype:      ", "Enter constraint:    "]
 
 # input line indicator for user input without preceding text in set-up.py               
 CHEVRON = ">>> "
