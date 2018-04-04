@@ -88,7 +88,7 @@ def fileout(columns, results, delim, host):
 def sql(inpt, info):
     """Runs a raw SQL query."""
     # checks if query is accessing a blocked table
-    if set(inpt).intersection(set(theme.BLOCKED)) is not {}:
+    if set(inpt).intersection(set(theme.BLOCKED)) != set():
         return
     
     command = inpt.pop(0)
