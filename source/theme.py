@@ -410,7 +410,7 @@ def adjust(table, adj): return "The table '" + table + "' has been " + adj + OTH
 
 
 # prints error message for when a non-existent function is called
-def funct_err(cmd): return "\nInvalid function" + ((" '"+cmd+"'") if cmd != "" else "") +": enter 'help' for more information."
+def funct_err(cmd): return "\nInvalid command" + ((" '"+cmd+"'") if cmd != "" else "") +": enter 'help' for more information."
 
 
 # prints the first line of the help command's output
