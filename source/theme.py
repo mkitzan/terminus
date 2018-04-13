@@ -1,15 +1,15 @@
 # *** TITLE VERSION ***
 
-VERSION = "Terminus v2.8"
+VERSION = "Terminus v2.9"
 
-# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v2.9
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v3.0
 TITLE = """
-      _______                  _                         ___    ___  
-     |__   __|                (_)                       |__ \  / _ \ 
-        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) || (_) |
-        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // /  > _ < 
-        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ | (_) |
-        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)___/  
+	  _______                  _                         ___   ___  
+	 |__   __|                (_)                       |__ \ / _ \ 
+		| | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) | (_) |
+		| |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // / \__, |
+		| |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ / / 
+		|_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)_/   
      Terminal Library Database
     """
 
@@ -45,8 +45,10 @@ CLOSE = "\nDatabase connection closed"
 HOST_ERROR = "\nInvalid host input"
 LOGIN_ERROR = "\nInvalid login credentials"
 CMD_ERROR = "\n        Invalid command"
-SCRIPT_ERROR = "\nScript must be a '.trm' file"
+SCRIPT_ERROR = "\nScript must be a '.trmx' file"
+TEMPL_ERROR = "\nTemplate must be a '.trmt' file"
 EXCEPT = "\nTry: help "
+TEMP_TABLE_ERR = "\nTable in template doesn't match host table"
 
 
 # *** TEXT PROMPTS ***
@@ -71,6 +73,7 @@ CONFIRM_TABLE = "Confirm table name:  "
 
 # keywords to list files in directory for commands script and report
 LIST_FILES = ["list", "ls", "dir"]
+LIST_TEMPS = ["templates", "temps"]
 
 # logic ops available in queries val0 = back-index to cut list by, val1 = SQL argument
 LOGIC_OPS = {"v": [-1, "' OR "], "^": [-1, "' AND "], "!": [-3, " NOT "]}
@@ -94,7 +97,7 @@ FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
          
 # special command specific flags
 # -S script flag               script
-# -v variable and view flag    script, report
+# -v view flag                 report
 # -h host flag                 change
 # -u user flag                 change
 # -X x-axis flag               plot
@@ -204,9 +207,11 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
 
         Example: stats -g science fiction -y 19??""",
              
-             "report": """        Creates a simple report from the output of both a 'search', 'stats', and 'plot' call. 
+             "report": """        Creates a simple report from the output of both a 'search', 'stats', and 'plot' call.
+        Terminus has default report templates for most tables. The user can create and use their own report templates, by including the '-r' or 
+        '--report' flag followed by a .trmt file located in the templates folder.
         All arguments are processed as a 'search' command. To view a report, use the '-v' special flag followed by the file name of the report.
-        To see a list of all reports, follow the '-v' flag with 'list', 'ls', or 'dir'.
+        To see a list of all reports, follow the '-v' flag with 'list', 'ls', or 'dir'; or 'temps', 'templates' to see all report templates.
         
         Example: report -T stories -g science fiction -s author""",
              
@@ -232,14 +237,14 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
         
         Example: system user table""",
              
-             "script": """        Declare the filename of the Terminus script (.trm) to be run with the '-S' flag. 
-        Script variables must be declared with the '-v' flag. The var name and value must be stated with an '=' and no spaces. 
+             "script": """        Declare the filename of the Terminus script (.trmx) to be run with the '-S' flag.
+        Script variables follow the script file name. The var name and value must be stated with an '=' and no spaces. 
         Where ever a variable name appears as a distinct token in the script with a '$' preceding it, it will be replaced by the value at run time.
         Each line in the script will be interpreted as a Terminus command: blank lines will be disregarded.
         To view a list of scripts available, follow the '-S' flag with either 'list', 'ls', or 'dir'.
         Users can access date related variables directly within a script: '$trm.weekday', '$trm.month', '$trm.day', '$trm.year', and '$trm.date'
         
-        Example: script -S progress.trm -v title=Sturgeon is Alive and Well... pages=53
+        Example: script -S progress.trmx title=Sturgeon is Alive and Well... pages=53
         Any appearances of '$title' would be replaced by 'Sturgeon is Alive and Well...', and '$pages' by '53'""",
              
              "exit": """        Exit takes no arguments. Used to safely leave the program.""",
@@ -268,7 +273,7 @@ HELP_STANDARD = """
         sql         allows user to enter a raw SQL query
         export      allows user to export data as a TSV
         system      allows user to create new DB objects
-        script      allows user to run a .trm script
+        script      allows user to run a .trmx script
         exit        safely exits program
         
     Terminus supports both GNU and SQL wildcards:
@@ -307,25 +312,25 @@ SOURCE = "Library"
 GRAPH_HEADER = "Results Graph(s): "
 
 # graph plotting parameters for the different table's reports
-# host table name: [[group header title, [x-axis col label, y-axis col label, agg-function, agg-scale, agg-axis, buffer value], ... ], ... ]
+# host table name: [[group header title, [non-agg col label, agg col label, agg-function, agg-scale, agg-axis], ... ], ... ]
 REPORTS = {SOURCE: [],
            
-           "Books": [["Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
-                     ["Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
+           "Books": [["Author\n", ["Author", "Title", "count", 1, "y"], ["Author", "Pages", "sum", 100, "y"]],
+                     ["Year\n", ["Year", "Title", "count", 1, "y"], ["Year", "Pages", "sum", 100, "y"]]],
                     
-           "Stories": [["Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
-                       ["Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
+           "Stories": [["Author\n", ["Author", "Title", "count", 1, "y"], ["Author", "Pages", "sum", 100, "y"]],
+                       ["Year\n", ["Year", "Title", "count", 1, "y"], ["Year", "Pages", "sum", 100, "y"]]],
                       
-           "Wishlist": [["Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
-                        ["Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100, "y", 1]]],
+           "Wishlist": [["Author\n", ["Author", "Title", "count", 1, "y"], ["Author", "Pages", "sum", 100, "y"]],
+                        ["Year\n", ["Year", "Title", "count", 1, "y"], ["Year", "Pages", "sum", 100, "y"]]],
                        
-           "Tracker": [["Date\n", ["Date", "Pages", "sum", 10, "y", 1]],
-                       ["Weekday\n", ["Weekday", "Pages", "avg", 10, "y", 1]],
-                       ["Month\n", ["Month", "Title", "count", 1, "y", 1], ["Month", "Pages", "sum", 100 , "y", 1]]],
+           "Tracker": [["Date\n", ["Date", "Pages", "sum", 10, "x"]],
+                       ["Weekday\n", ["Weekday", "Pages", "avg", 10, "y"]],
+                       ["Month\n", ["Month", "Title", "count", 1, "y"], ["Month", "Pages", "sum", 100 , "y"]]],
                        
-           "Planner": [["Author\n", ["Author", "Title", "count", 1, "y", 1], ["Author", "Pages", "sum", 100, "y", 1]],
-                       ["Month\n", ["Month", "Title", "count", 1, "y", 1], ["Month", "Pages", "sum", 100 , "y", 1]],
-                       ["Year\n", ["Year", "Title", "count", 1, "y", 1], ["Year", "Pages", "sum", 100 , "y", 1]]],
+           "Planner": [["Author\n", ["Author", "Title", "count", 1, "y"], ["Author", "Pages", "sum", 100, "y"]],
+                       ["Month\n", ["Month", "Title", "count", 1, "y"], ["Month", "Pages", "sum", 100 , "y"]],
+                       ["Year\n", ["Year", "Title", "count", 1, "y"], ["Year", "Pages", "sum", 100 , "y"]]],
                       
            "Quotes": [],
            

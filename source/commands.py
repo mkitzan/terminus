@@ -10,38 +10,25 @@ from os import listdir
 
 def script_vars(inpt):
     """Creates a dictionary of script variables and finds script file name."""
-    infile = ""
+    infile = find_op(inpt, "-S", "--script")
     var_dict = {}
-    var = []
-    
-    for i in reversed(range(len(inpt))):
-        # sets values in var_dict when -v flag shows
-        if inpt[i] == "-v" or inpt[i] == "--variables":
-            vals = []
-            name = []
+    vals = []
+    name = []
             
-            for v in reversed(var):
-                if "=" in v:
-                    name = v.split("=")
-                    vals.insert(0, name[1])
-                    var_dict["$"+name[0]] = " ".join(vals)
-                    vals = []
-                else:
-                    vals.insert(0, v)
-                    
-            var = []
-        # sets the file name of the script
-        elif inpt[i] == "-S" or inpt[i] == "--script":
-            infile = " ".join(var)
-            var = []
+    for v in reversed(inpt):
+        if "=" in v:
+            name = v.split("=")
+            vals.insert(0, name[1])
+            var_dict["$"+name[0]] = " ".join(vals)
+            vals = []
         else:
-            var.insert(0, inpt[i])
+            vals.insert(0, v)
             
     return infile, var_dict
 
 
 def script(inpt, info):
-    """Runs a custom Terminus script (.trm)."""
+    """Runs a custom Terminus script (.trmx)."""
     infile, var_dict = script_vars(inpt)
     
     if infile.lower() in theme.LIST_FILES:
@@ -49,9 +36,8 @@ def script(inpt, info):
         fileview("./scripts/")
         input(theme.PAUSE)
     else:
-        if infile[-4:] != ".trm":
-            input(theme.SCRIPT_ERROR)
-            return
+        if infile[-5:] != ".trmx":
+            raise ValueError(theme.SCRIPT_ERROR)
     
         with open("scripts/" + infile, "r") as script:
             for line in script:
@@ -148,7 +134,6 @@ def plot(inpt, info):
                 " FROM " + info[1] + ((" WHERE " + query.parse_flags(args["whr"])) if spec_vars[0] else "") + " ORDER BY " + args[op_flg][0]
 
     columns, results = query.execute_sql(info[0], sql_query)
-    
     dataprint.plot(columns, results, spec_vars[2], spec_vars[1], spec_vars[3][1].lower(), buffer_val=(0 if spec_vars[3][1] == "X" else 1))
     input(theme.PAUSE)
 
@@ -235,7 +220,7 @@ def upload(inpt, info):
 
             # prints the progress bar
             session.clear_screen()
-            print(info[2] + "@" + info[1] + ": " + "upload " + " ".join(inpt)) 
+            print(info[2] + "@" + info[1] + ": upload " + " ".join(inpt)) 
             print("\n\n    |" + ("#" * progress) + (" " * (theme.PROGRESS - progress)) + "|  " + str(ratio) + "%")
             print("\n    '" + row + "'")
             
@@ -311,7 +296,40 @@ def fileview(dir_path):
     """Prints out the files in the passed directory."""
     for fl in sorted(listdir(dir_path)):
         print(fl)
+        
+        
+def parse_report(rep, info):
+    """Turns a .trmt report template into a datastructure readable by dataprint."""
+    table = ""
+    template = []
+    curr = []
     
+    if rep[-5:] != ".trmt":
+        raise ValueError(theme.TEMPL_ERROR)
+    
+    with open("templates/"+rep) as rep:
+        for line in rep:
+            if line[0] == "@":
+                table = line[1:-1]
+                
+                if table != info:
+                    raise ValueError(theme.TEMP_TABLE_ERR)
+                    
+            elif line[0] != "\n" and line[0] != "#":
+                if line[0] == ">":
+                    template += [curr]
+                    curr = [line[1:]]
+                else:
+                    line = line[:-1].split(", ")
+                    line[3] = int(line[3])
+                    line[5] = int(line[5])
+                    curr += [line]
+    
+    del template[0]
+    template += [curr]
+                
+    return template
+            
     
 def report(inpt, info):
     """Performs a search with the input, then passes the results to dataprint's export to create a simply report."""
@@ -328,6 +346,8 @@ def report(inpt, info):
         
         if filename.lower() in theme.LIST_FILES:
             fileview("./reports/")
+        elif filename.lower() in theme.LIST_TEMPS:
+            fileview("./templates/")
         else: 
             filename += ".txt" if filename[-4:] != ".txt" else ""
             
@@ -337,11 +357,27 @@ def report(inpt, info):
                     
         input(theme.PAUSE)
     else:
+        rep = -1
+        templ = None
+        
+        if "-r" in inpt:
+            rep = inpt.index("-r")
+        elif "--report" in inpt:
+            rep = inpt.index("--report")
+            
+        if rep != -1:
+            inpt.pop(rep)
+            rep = inpt.pop(rep)
+            
+            templ = parse_report(rep, info[1])
+        else:
+            templ = theme.REPORTS[info[1].capitalize()]
+        
         args = [el for el in inpt]
         sql_query = query.parse_sql(inpt, info[1], "search")
 
         columns, results = query.execute_sql(info[0], sql_query)
-        dataprint.export(columns, results, tb=info[1], args="report " + " ".join(args), source=info[1].capitalize())
+        dataprint.export(columns, results, tb=info[1], args="report " + " ".join(args), source=info[1].capitalize(), template=templ)
 
 
 def search(inpt, info):
@@ -354,12 +390,12 @@ def search(inpt, info):
     input(theme.PAUSE)
     
     
-def find_op(inpt):
+def find_op(inpt, short, verbose):
     """Cuts out args stating the operation to perform."""
     for i in range(len(inpt)):
         curr = inpt[i][1:3].upper() if len(inpt[i]) > 2 else inpt[i]
         
-        if curr == "-C" and i+1 < len(inpt):
+        if (curr == short or curr == verbose) and i+1 < len(inpt):
             op = inpt[i+1]
             inpt[i:i+2] = []
             return op
@@ -368,7 +404,7 @@ def find_op(inpt):
 def distinct(inpt, info):
     """Executes a standard search query, then cuts out non-distinct records.
     After, executes dataprint functions: stats, report, or search on the results set."""
-    op = find_op(inpt)
+    op = find_op(inpt, "-C", "--command")
         
     sql_query = query.parse_sql(inpt[1:], info[1], "search")
     
@@ -413,16 +449,14 @@ def change(inpt, info):
                 info[1] = inpt[i+1]
                 session.title(info[1])
             else:
-                input(theme.HOST_ERROR.strip("\n"))
-                return
+                raise ValueError(theme.HOST_ERROR)
                 
             i += 1
         elif (inpt[i] == "-u" or inpt[i] == "--user") and i+2 < length:
             if session.verify(info[0], inpt[i+1], inpt[i+2]):
                 info[2] = inpt[i+1]
             else:
-                input(theme.LOGIN_ERROR.strip("\n"))
-                return
+                raise ValueError(theme.LOGIN_ERROR)
                 
             i += 2
 

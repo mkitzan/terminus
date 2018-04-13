@@ -1,0 +1,9 @@
+@tracker
+
+>Year
+Year, Title, count, 10, y
+Year, Pages, sum, 1000 , y
+
+>Weekday
+Weekday, Pages, avg, 10, y
+

@@ -1,0 +1,9 @@
+@tracker
+
+>Month
+Month, Title, count, 1, y
+Month, Pages, sum, 100 , y
+
+>Weekday
+Weekday, Pages, avg, 10, y
+

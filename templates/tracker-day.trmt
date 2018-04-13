@@ -1,0 +1,8 @@
+@tracker
+
+>Date
+Date, Pages, sum, 10, x
+
+>Weekday
+Weekday, Pages, avg, 10, y
+

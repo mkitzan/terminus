@@ -1,7 +1,7 @@
 import session
 import commands
 import theme
-import setup
+import set_up
 
 
 # function dictionary which is used to correctly call the user's command
@@ -13,7 +13,7 @@ FUNCTIONS = {"search": commands.search, "insert": commands.insert,
              "help": commands.cmd_help, "upload": commands.upload, 
              "stats": commands.cmd_stats, "report": commands.report, 
              "distinct": commands.distinct, "sql": commands.sql,
-             "export": commands.tsv, "system": setup.from_terminus,
+             "export": commands.tsv, "system": set_up.from_terminus,
              "script": commands.script}
 
 

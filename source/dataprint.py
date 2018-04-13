@@ -23,7 +23,7 @@ SFUNCTS = {"Total": [0, lambda x: len(x)],
            "Mean": [6, lambda x: round(statistics.mean(x), ROUND)],
            "Median": [7, lambda x: int(statistics.median(x)) if type(x[0]) is int else statistics.median(x)], 
            "Mode": [8, lambda x: statistics.mode(x)],
-           "Standard Deviation": [9, lambda x: round(statistics.stdev(x), ROUND)], 
+           "Std Dev": [9, lambda x: round(statistics.stdev(x), ROUND)], 
            "Variance": [10, lambda x: round(statistics.variance(x), ROUND)]}
 
 # aggregate functions to plot by
@@ -59,7 +59,7 @@ def plot_aggregate_x(columns, res, max_y, max_x, buffer_val, point, scale, op, f
     
     # graph body
     for el in res:
-        funct((((" " * max_y) + "|\n") * buffer_val) + (" " * (max_y - len(el[0]))) + el[0] + "|" + (point * el[1]))
+        funct((((" " * max_y) + "|\n") * buffer_val) + (" " * (max_y - len(el[0]))) + str(el[0]) + "|" + (point * el[1]))
     
     # x-axis
     funct(" " * (max_y+1) + "-" * max_x)
@@ -260,16 +260,16 @@ def stats(columns, values, point="*", buffer_val=1, remainder=4, nvalid="-", fun
     table(columns, values, point, buffer_val, funct)
     
     
-def exp_plot(x, y, columns, values, op, scale, axis, buffer_val, fnct):
+def exp_plot(x, y, columns, values, op, scale, axis, fnct):
     """Plot helper function for 'export'. Formats results for plotting."""
     temp = [values[columns.index(x)], values[columns.index(y)]]
     temp = sorted([list(el) for el in zip(*temp)], key=lambda x: x[0])
-    plot([x, y], temp, op, scale, axis, buffer_val=1, funct=fnct)
+    plot([x, y], temp, op, scale, axis, buffer_val=(0 if axis == "x" else 1), funct=fnct)
     
     fnct("")
 
 
-def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", source=theme.SOURCE):
+def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", source=theme.SOURCE, template=[]):
     """Creates and writes data to export file. 
     Export file includes: result set table, statistics table, and four different graphs."""
     ROUND = remainder
@@ -282,16 +282,16 @@ def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, r
     expfile.write(theme.LABEL_RSTATS)
     stats(columns, values, point, buffer_val, remainder, nvalid, lambda x: expfile.write(x + "\n"))
     
-    if theme.REPORTS[source] != []:
+    if template != []:
         # transpose graph correctly, change 'y' -> 'x', and buffer_val=0
         values = [list(el) for el in zip(*values)]
         expfile.write("\n")
 
         # plot / write the pre-set report graphs from within the theme file
-        for group in theme.REPORTS[source]:
+        for group in template:
             expfile.write(theme.GRAPH_HEADER+group[0])
 
             for graph in group[1:]:
-                exp_plot(graph[0], graph[1], columns, values, graph[2], graph[3], graph[4], graph[5], lambda x: expfile.write(x + "\n"))
+                exp_plot(graph[0], graph[1], columns, values, graph[2], graph[3], graph[4], lambda x: expfile.write(x + "\n"))
         
     expfile.close()
