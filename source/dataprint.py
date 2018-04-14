@@ -269,13 +269,13 @@ def exp_plot(x, y, columns, values, op, scale, axis, fnct):
     fnct("")
 
 
-def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", source=theme.SOURCE, template=[]):
+def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", source=theme.SOURCE, template=[], rep_name=""):
     """Creates and writes data to export file. 
     Export file includes: result set table, statistics table, and four different graphs."""
     ROUND = remainder
     NVALID = nvalid
     
-    expfile = open(PATH + strftime("%m-%d-%Y") + " " + source + ".txt", "w+")
+    expfile = open(PATH + strftime("%m-%d-%Y") + " " + source + ("" if rep_name == "" else " ("+rep_name+")") +".txt", "w+")
     expfile.write(strftime(theme.DATE_TIME + " %H:%M:%S") + theme.LABEL_TB + tb + theme.LABEL_ARGS + args + theme.LABEL_RSET)    
     table(columns, values, point, buffer_val, lambda x: expfile.write(x + "\n"))
     

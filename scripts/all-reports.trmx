@@ -1,5 +1,7 @@
 change -h tracker
-report -D *
+report -r day.trmt -D *
+report -r month.trmt -D *
+report -r year.trmt -D *
 
 change -h stories
 report -F TRUE -s author collection year title

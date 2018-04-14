@@ -10,6 +10,42 @@ from time import strftime
 from shutil import get_terminal_size
 
 
+def change_pw(info, inpt):
+    """Changes password in credentials table by deleting old hash and generating/inserting new hash"""
+    password = ""
+    valid = False
+
+    while not valid:
+        print()
+        password = getpass("Enter old " + theme.GET_PW)
+
+        valid = verify(info[0], info[2], password)
+        
+        if not valid:
+            print(theme.PASS_ERROR[1:] + "\n")
+            
+    query.execute_sql(info[0], "DELETE FROM credentials WHERE Hash='" + hash_credentials(info[2], password) + "'")
+    query.execute_sql(info[0], "INSERT INTO credentials VALUES('" + hash_credentials(info[2], inpt) + "')")
+
+
+def change_username(info, inpt):
+    """Changes username in credentials table by deleting old hash and generating/inserting new hash"""
+    password = ""
+    valid = False
+
+    while not valid:
+        print()
+        password = getpass("Enter " + theme.GET_PW)
+
+        valid = verify(info[0], info[2], password)
+        
+        if not valid:
+            print(theme.PASS_ERROR[1:] + "\n")
+            
+    query.execute_sql(info[0], "DELETE FROM credentials WHERE Hash='" + hash_credentials(info[2], password) + "'")
+    query.execute_sql(info[0], "INSERT INTO credentials VALUES('" + hash_credentials(inpt, password) + "')")
+
+
 def create_record(inpt, info):
     """Creates and submits a record of a user inputted command."""
     sql_query = "INSERT INTO records VALUES('" + strftime(theme.DATE_TIME + " %H:%M:%S") + "', '" + info[2] + "', '" + \

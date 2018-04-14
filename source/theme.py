@@ -1,15 +1,15 @@
 # *** TITLE VERSION ***
 
-VERSION = "Terminus v2.9"
+VERSION = "Terminus v1.3.0"
 
-# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v3.0
+# font BIG, two spaces between name and ver: http://patorjk.com/software/taag/#p=display&f=Big&t=Terminus%20%20v1.3.1
 TITLE = """
-	  _______                  _                         ___   ___  
-	 |__   __|                (_)                       |__ \ / _ \ 
-	    | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   __ ) | (_) |
-	    | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / // / \__, |
-	    | |  __/ |  | | | | | | | | | | |_| \__ \   \ V // /_ _ / / 
-	    |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/|____(_)_/   
+      _______                  _                         __   ____   ___  
+     |__   __|                (_)                       /_ | |___ \ / _ \ 
+        | | ___ _ __ _ __ ___  _ _ __  _   _ ___   __   _| |   __) | | | |
+        | |/ _ \ '__| '_ ` _ \| | '_ \| | | / __|  \ \ / / |  |__ <| | | |
+        | |  __/ |  | | | | | | | | | | |_| \__ \   \ V /| |_ ___) | |_| |
+        |_|\___|_|  |_| |_| |_|_|_| |_|\__,_|___/    \_/ |_(_)____(_)___/   
      Terminal Library Database
     """
 
@@ -44,6 +44,8 @@ TITLE_SEPARATOR = " - "
 CLOSE = "\nDatabase connection closed"
 HOST_ERROR = "\nInvalid host input"
 LOGIN_ERROR = "\nInvalid login credentials"
+PASS_MISMATCH = "\nBoth password arguments must match"
+PASS_ERROR = "\nInvalid password"
 CMD_ERROR = "\n        Invalid command"
 SCRIPT_ERROR = "\nScript must be a '.trmx' file"
 TEMPL_ERROR = "\nTemplate must be a '.trmt' file"
@@ -100,6 +102,8 @@ FLAGS = {"-a": "Author", "-t": "Title", "-g": "Genre", "-T": "Type",
 # -v view flag                 report
 # -h host flag                 change
 # -u user flag                 change
+# -p password flag             change
+# -n username flag             change
 # -X x-axis flag               plot
 # -Y y-axis flag               plot
 # -C command flag              distinct
@@ -176,12 +180,14 @@ HELP_TEXT = {"search": """        The go to command for querying the host table'
              
         Example: avg year -g science fiction""", 
              
-             "change": """        Allows user to change the current host table, or user.
+             "change": """        Allows user to change the current host table, user, username, and password.
         Change has two additional flags:
-            -h or --host    specifies name of new host table
-            -u or --user    takes two arguments following the flag: username password
+            -h or --host        specifies name of new host table
+            -u or --user        takes two arguments following the flag: username password
+            -n or --name        takes one argument, the new username
+            -p or --password    takes to arguments, both being the new password      
             
-        Example: change -h short stories -u test_user pw1234""", 
+        Example: change -h short stories -u test_user pw1234 -p new_pw_123 new_pw_123""", 
              
              "plot": """        Plot prints a simple graph of an aggregated query
         Each axis flag needs a DB column specified, and one of those two states the aggregate type and the scale to plot by
@@ -268,7 +274,7 @@ HELP_STANDARD = """
         help        prints a general help page, and command specific help pages
         stats       outputs a statistics table on a 'search' command
         report      creates a simple report from query output
-        change      allows host table and user change
+        change      allows host table, user, username, and password change
         upload      allows for bulk 'insert' from TSV or CSV file
         sql         allows user to enter a raw SQL query
         export      allows user to export data as a TSV

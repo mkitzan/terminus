@@ -298,6 +298,26 @@ def fileview(dir_path):
         print(fl)
         
         
+def get_template(info, inpt):
+    rep = ""
+    templ = []
+    
+    if "-r" in inpt:
+        rep = inpt.index("-r")
+    elif "--report" in inpt:
+        rep = inpt.index("--report")
+        
+    if rep != "":
+        inpt.pop(rep)
+        rep = inpt.pop(rep)
+        
+        templ = parse_report(rep, info[1])
+    else:
+        templ = theme.REPORTS[info[1].capitalize()]
+        
+    return rep[:-5], templ
+        
+        
 def parse_report(rep, info):
     """Turns a .trmt report template into a datastructure readable by dataprint."""
     table = ""
@@ -322,7 +342,6 @@ def parse_report(rep, info):
                 else:
                     line = line[:-1].split(", ")
                     line[3] = int(line[3])
-                    line[5] = int(line[5])
                     curr += [line]
     
     del template[0]
@@ -351,33 +370,19 @@ def report(inpt, info):
         else: 
             filename += ".txt" if filename[-4:] != ".txt" else ""
             
-            with open("reports/"+filename.capitalize(), "r") as rep:
+            with open("reports/"+filename, "r") as rep:
                 for line in rep:
                     print(line, end="")
                     
         input(theme.PAUSE)
     else:
-        rep = -1
-        templ = None
-        
-        if "-r" in inpt:
-            rep = inpt.index("-r")
-        elif "--report" in inpt:
-            rep = inpt.index("--report")
-            
-        if rep != -1:
-            inpt.pop(rep)
-            rep = inpt.pop(rep)
-            
-            templ = parse_report(rep, info[1])
-        else:
-            templ = theme.REPORTS[info[1].capitalize()]
+        rep, templ = get_template(info, inpt)
         
         args = [el for el in inpt]
         sql_query = query.parse_sql(inpt, info[1], "search")
 
         columns, results = query.execute_sql(info[0], sql_query)
-        dataprint.export(columns, results, tb=info[1], args="report " + " ".join(args), source=info[1].capitalize(), template=templ)
+        dataprint.export(columns, results, tb=info[1], args="report " + " ".join(args), source=info[1], template=templ, rep_name=rep)
 
 
 def search(inpt, info):
@@ -404,7 +409,13 @@ def find_op(inpt, short, verbose):
 def distinct(inpt, info):
     """Executes a standard search query, then cuts out non-distinct records.
     After, executes dataprint functions: stats, report, or search on the results set."""
+    rep = -1
+    templ = None
+    
     op = find_op(inpt, "-C", "--command")
+    
+    if op == "report":
+        rep, templ = get_template(info, inpt)
         
     sql_query = query.parse_sql(inpt[1:], info[1], "search")
     
@@ -426,7 +437,8 @@ def distinct(inpt, info):
     if op == "stats":
         dataprint.stats(columns, results)
     elif op == "report":
-        dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt), source=info[1].capitalize())
+        
+        dataprint.export(columns, results, info[1], "distinct " + " ".join(inpt), source=info[1], template=templ, rep_name=rep)
         return
     elif op == "tsv":
         fileout(columns, results, "\t", info[1])
@@ -443,22 +455,35 @@ def change(inpt, info):
 
     for i in range(length):
         if (inpt[i] == "-h" or inpt[i] == "--host") and i+1 < length:
-            inpt[i+1] = inpt[i+1].lower()
+            i += 1
             
-            if session.change_host(info[0], inpt[i+1]):
-                info[1] = inpt[i+1]
+            inpt[i] = inpt[i].lower()
+            
+            if session.change_host(info[0], inpt[i]):
+                info[1] = inpt[i]
                 session.title(info[1])
             else:
                 raise ValueError(theme.HOST_ERROR)
                 
-            i += 1
         elif (inpt[i] == "-u" or inpt[i] == "--user") and i+2 < length:
-            if session.verify(info[0], inpt[i+1], inpt[i+2]):
-                info[2] = inpt[i+1]
+            i += 2
+            
+            if session.verify(info[0], inpt[i-1], inpt[i]):
+                info[2] = inpt[i-1]
             else:
                 raise ValueError(theme.LOGIN_ERROR)
                 
+        elif (inpt[i] == "-n" or inpt[i] == "--name") and i+1 < length:
+            i += 1
+            session.change_username(info, inpt[i])
+            info[2] = inpt[i]
+            
+        elif (inpt[i] == "-p" or inpt[i] == "--password") and i+2 < length:
             i += 2
+            if inpt[i-1] != inpt[i]:
+                raise ValueError(theme.PASS_MISMATCH)
+                
+            session.change_pw(info, inpt[i-1])
 
 
 def close_out(inpt, info):
