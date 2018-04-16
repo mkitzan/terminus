@@ -324,7 +324,7 @@ REPORTS = {SOURCE: [],
            "Books": [["Author\n", ["Author", "Title", "count", 1, "y"], ["Author", "Pages", "sum", 100, "y"]],
                      ["Year\n", ["Year", "Title", "count", 1, "y"], ["Year", "Pages", "sum", 100, "y"]]],
                     
-           "Stories": [["Author\n", ["Author", "Title", "count", 1, "y"], ["Author", "Pages", "sum", 100, "y"]],
+           "Stories": [["Author\n", ["Author", "Title", "count", 1, "x"], ["Author", "Pages", "sum", 10, "x"]],
                        ["Year\n", ["Year", "Title", "count", 1, "y"], ["Year", "Pages", "sum", 100, "y"]]],
                       
            "Wishlist": [["Author\n", ["Author", "Title", "count", 1, "y"], ["Author", "Pages", "sum", 100, "y"]],
