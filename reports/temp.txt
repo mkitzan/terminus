@@ -1,0 +1,2 @@
+Delete this file before use. 
+It's only here so GH includes the 'reports' folder in the repo.
