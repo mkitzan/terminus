@@ -294,11 +294,14 @@ def aggregate(agg, inpt, info):
     
 def fileview(dir_path):
     """Prints out the files in the passed directory."""
+    print("Files in directory '" + dir_path + "':")
     for fl in sorted(listdir(dir_path)):
-        print(fl)
+        print("\t" + fl)
         
         
 def get_template(info, inpt):
+    """Finds and reads the values of a 'report' flag. 
+       Returns the report filename, and template datastructure."""
     rep = ""
     templ = []
     
