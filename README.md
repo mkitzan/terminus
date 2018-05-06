@@ -7,6 +7,9 @@ The input syntax has now been unified under the comfortable, user friendly, flag
 Unlike the previous versions, Terminus was designed to be table, and column scalable. 
 In previous versions it would have been a nightmare to integrate new table into the system; however, now it's fairly straight forward. Implementing a new column or table involves adding values to datastructures in the the theme file ('theme.py'), and performing SQL operations to add the table or column.
 
+# Issues?
+If you have any issues setting Terminus up, using it, or run into bugs, please leave an issue in that tab of the repo. I'm happy to answer or fix any issues which occur. No current issue submission format exists. If it's a bug include the terminal output, so I can locate the problem line. If it's a set-up / use issue, please describe in detail the problem arrisen using vocabulary from the help pages or this readme (if none exist to describe your issue, then go for whatever).
+
 # Features
 - 4 library host tables (books, stories, quotes, wishlist), and 3 administrative host table (tracker, records, planner)
 - 19 command functions including: file upload, plot graphical query output, the aggregate trinity, query result export, scripting...
