@@ -5,26 +5,18 @@ from shutil import get_terminal_size
 from time import strftime
 from math import ceil
 
-
-# default parameters for tables and exports
-WINDOW = 180
-PATH = "reports/"
-NVALID = "-"
-MISSING = "Not Provided"
-ROUND = 4
-
 # statistic functions for the stats table
 SFUNCTS = {"Total": [0, lambda x: len(x)], 
            "Unique": [1, lambda x: len(set(x))],
            "Sum Total": [2, lambda x: sum(x)], 
            "Sum Unique": [3, lambda x: sum(set(x))],
-           "Minimum": [4, lambda x: NVALID if type(x[0]) is str else x[0]],
-           "Maximum": [5, lambda x: NVALID if type(x[-1]) is str else x[-1]],
-           "Mean": [6, lambda x: round(statistics.mean(x), ROUND)],
+           "Minimum": [4, lambda x: theme.NVALID if type(x[0]) is str else x[0]],
+           "Maximum": [5, lambda x: theme.NVALID if type(x[-1]) is str else x[-1]],
+           "Mean": [6, lambda x: round(statistics.mean(x), theme.ROUND)],
            "Median": [7, lambda x: int(statistics.median(x)) if type(x[0]) is int else statistics.median(x)], 
            "Mode": [8, lambda x: statistics.mode(x)],
-           "Std Dev": [9, lambda x: round(statistics.stdev(x), ROUND)], 
-           "Variance": [10, lambda x: round(statistics.variance(x), ROUND)]}
+           "Std Dev": [9, lambda x: round(statistics.stdev(x), theme.ROUND)], 
+           "Variance": [10, lambda x: round(statistics.variance(x), theme.ROUND)]}
 
 # aggregate functions to plot by
 PLOT_OPS = {"count": lambda arr: len(set(arr)),
@@ -238,12 +230,12 @@ def process(values, columns):
                 stats[SFUNCTS[key][0]] += [SFUNCTS[key][1](column)]
             # case where the value is not a number
             except Exception:
-                stats[SFUNCTS[key][0]] += [NVALID]
+                stats[SFUNCTS[key][0]] += [theme.NVALID]
     
     # catches case where results set is empty
     if len(stats[0]) == 1:
         for i in range(len(stats)):
-            stats[i] += [NVALID] * len(columns)
+            stats[i] += [theme.NVALID] * len(columns)
     
     columns = ["Statistic"] + columns
 
@@ -252,8 +244,8 @@ def process(values, columns):
 
 def stats(columns, values, point="*", buffer_val=1, remainder=4, nvalid="-", funct=print):
     """Calls functions to process statistics, and print the table."""
-    ROUND = remainder
-    NVALID = nvalid
+    theme.ROUND = remainder
+    theme.NVALID = nvalid
     
     values, columns = process(values, columns)
     
@@ -269,13 +261,13 @@ def exp_plot(x, y, columns, values, op, scale, axis, fnct):
     fnct("")
 
 
-def export(columns, values, tb=MISSING, args=MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", source=theme.SOURCE, template=[], rep_name=""):
+def export(columns, values, tb=theme.MISSING, args=theme.MISSING, point="*", buffer_val=1, remainder=4, nvalid="-", source=theme.SOURCE, template=[], rep_name=""):
     """Creates and writes data to export file. 
     Export file includes: result set table, statistics table, and four different graphs."""
-    ROUND = remainder
-    NVALID = nvalid
+    theme.ROUND = remainder
+    theme.NVALID = nvalid
     
-    expfile = open(PATH + strftime("%m-%d-%Y") + " " + source + ("" if rep_name == "" else " ("+rep_name+")") +".txt", "w+")
+    expfile = open(theme.PATH + strftime("%m-%d-%Y") + " " + source + ("" if rep_name == "" else " ("+rep_name+")") +".txt", "w+")
     expfile.write(strftime(theme.DATE_TIME + " %H:%M:%S") + theme.LABEL_TB + tb + theme.LABEL_ARGS + args + theme.LABEL_RSET)    
     table(columns, values, point, buffer_val, lambda x: expfile.write(x + "\n"))
     

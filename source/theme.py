@@ -38,6 +38,16 @@ TERMINAL_TITLE2 = ""
 TITLE_SEPARATOR = " - "
 
 
+# *** DATAPRINT STATIC DATA / DEFAULT PARAMETERS ***
+
+# default parameters for tables and exports
+WINDOW = 180
+PATH = "reports/"
+NVALID = "-"
+MISSING = "Not Provided"
+ROUND = 4
+
+
 # *** ERROR TEXT ***
 
 # error and pause text
