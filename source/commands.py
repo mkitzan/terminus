@@ -216,6 +216,8 @@ def upload(inpt, info):
             ratio = curr / file_len
             progress = ceil(ratio * theme.PROGRESS)
             ratio = ceil(ratio * 100)
+            
+            row = row.replace("'", "''")
             row = funct(row)
 
             # prints the progress bar

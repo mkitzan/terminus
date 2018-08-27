@@ -24,7 +24,6 @@ If you have any issues setting Terminus up, using it, or run into bugs, please l
 - Make sure you have sqlite3 installed on your machine (https://www.sqlite.org/download.html)
 - Run setup.py from a terminal, it will allow you to create a new user
 - Create a CSV or TSV of your current library using the expected column ordering format (title, author, genre, year, pages, type, format, finished)
-Beware of single quotes, SQL syntax expects two single quotes ('') in the place of a one single quote (')
 - Execute an 'upload' command
 
 # General Use
