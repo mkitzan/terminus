@@ -77,7 +77,7 @@ All arguments are processed as a 'search' command.
 Any script variable must be declared in the script command arguments, and inside the script a variable call must be preceded by '$'.
 Look at the example script 'complete.trm' in the scripts folder.
 
-      user@host: script -S complete.trm -v title=Sturgeon is Alive and Well...
+      user@host: script -S complete.trm title=Sturgeon is Alive and Well...
 - sql, allows user to execute a raw SQL statement. The statement can't query sqlite_master nor credentials.
 Must declare either 'search', 'stats', and 'tsv' as the first argument.
 
